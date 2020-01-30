@@ -1,0 +1,11 @@
+<RCC>
+    <qresource prefix="/">
+        <file>images/green_shield_icon.png</file>
+        <file>images/red_shield_icon.png</file>
+        <file>images/Edit.png</file>
+        <file>images/GreenTick.png</file>
+        <file>images/redCross.png</file>
+	<file>images/redMinus.png</file>
+	<file>images/greenPlus.png</file>
+    </qresource>
+</RCC>
