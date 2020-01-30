@@ -17,7 +17,7 @@ abStartupManager is a VPN, Startup and Shutdown Manager written using Qt for Ubu
 
 - Disconnect VPN on Quit
 
-- Display connection state as 'on top' icon for instant visibility of connection state
+- Display connection state as *on top* icon for instant visibility of connection state
 
 ## ToDo
 
@@ -35,7 +35,7 @@ abStartupManager is a VPN, Startup and Shutdown Manager written using Qt for Ubu
 
 ## Warnings
 
-abStartupManager is intended to run as a normal user but use some commands that require ''sudo'' rights. the file ''/etc/sudoers'' could be modified to allow the user running abStartupManager the necessary permissions as follows:
+abStartupManager is intended to run as a normal user but use some commands that require *sudo* rights. the file */etc/sudoers* could be modified to allow the user running abStartupManager the necessary permissions as follows:
 
 ```
   $ sudo visudo
@@ -48,7 +48,7 @@ Add the following lines
   USER ALL=(root) NOPASSWD: /usr/bin/killall
 ```
 
-Change ''USER'' to the user you wish to add the permission
+Change *USER* to the user you wish to add the permission
 
 ## Credits
 
