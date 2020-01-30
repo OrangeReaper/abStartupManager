@@ -3,13 +3,15 @@ abStartupManager
 
 abStartupManager is a VPN, Startup and Shutdown Manager written using Qt for Ubuntu Desktop. 
 
+See the [Wiki](https://github.com/OrangeReaper/abStartupManager/wiki) for some additional notes on Ubuntu Desktop Security.
+
 ## abStartupManager Supports
 
 - Running of script when VPN Connects (for the first time)
 
 - Connect to alternate Server if VPN disconnects
 
-- Connection to VPN Server using .ovpn files
+- Connection to VPN Server using .ovpn files (frontend for openvpn)
 
 - Email notification when non requested vpn disconnect occurs
 
