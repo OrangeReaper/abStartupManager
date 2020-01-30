@@ -1,7 +1,7 @@
 abStartupManager
 ================
 
-abStartupManager is a VPN, Startup and Shutdown Manager written using Qt for Ubuntu Desktop.
+abStartupManager is a VPN, Startup and Shutdown Manager written using Qt for Ubuntu Desktop. 
 
 ## abStartupManager Supports
 
