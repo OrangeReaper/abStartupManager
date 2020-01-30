@@ -33,6 +33,14 @@ abStartupManager is a VPN, Startup and Shutdown Manager written using Qt for Ubu
 
 - Add tooltip to show which server is connected on mouse hover
 
+## Requires
+
+abStartupManager requires [openvpn](https://www.ovpn.com/en) to be installed, eg
+
+```
+  $ sudo apt install openvpn
+```
+
 ## Warnings
 
 abStartupManager is intended to run as a normal user but use some commands that require *sudo* rights. the file */etc/sudoers* could be modified to allow the user running abStartupManager the necessary permissions as follows:
