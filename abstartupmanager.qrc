@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/r">
         <file>defaultSettings.json</file>
+        <file>README.md</file>
     </qresource>
 </RCC>
