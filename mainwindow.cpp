@@ -18,6 +18,8 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    setToolTip("v0.101.0");
+
     QCoreApplication::setOrganizationName("abondServices");//(Strings::organisationName);
     QCoreApplication::setOrganizationDomain("abondservices.co.uk");//(Strings::organisationDomain);
     QCoreApplication::setApplicationName("abStartupManager");//(Strings::applicationName);

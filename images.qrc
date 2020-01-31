@@ -5,7 +5,8 @@
         <file>images/Edit.png</file>
         <file>images/GreenTick.png</file>
         <file>images/redCross.png</file>
-	<file>images/redMinus.png</file>
-	<file>images/greenPlus.png</file>
+        <file>images/redMinus.png</file>
+        <file>images/greenPlus.png</file>
+        <file>images/abStartupManager.png</file>
     </qresource>
 </RCC>

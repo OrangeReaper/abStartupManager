@@ -13,8 +13,57 @@
   <property name="windowTitle">
    <string>Settings</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
-   <item>
+  <property name="windowIcon">
+   <iconset resource="images.qrc">
+    <normaloff>:/images/abStartupManager.png</normaloff>:/images/abStartupManager.png</iconset>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QToolButton" name="actionAddProfile">
+       <property name="toolTip">
+        <string>Add Profile</string>
+       </property>
+       <property name="text">
+        <string>...</string>
+       </property>
+       <property name="icon">
+        <iconset resource="images.qrc">
+         <normaloff>:/images/greenPlus.png</normaloff>:/images/greenPlus.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="actionRemoveProfile">
+       <property name="toolTip">
+        <string>Remove Profile</string>
+       </property>
+       <property name="text">
+        <string>...</string>
+       </property>
+       <property name="icon">
+        <iconset resource="images.qrc">
+         <normaloff>:/images/redMinus.png</normaloff>:/images/redMinus.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+   <item row="1" column="0">
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
       <number>1</number>
@@ -31,7 +80,7 @@
      </widget>
     </widget>
    </item>
-   <item>
+   <item row="2" column="0">
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -43,7 +92,9 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="images.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>buttonBox</sender>
@@ -77,5 +128,41 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actionAddProfile</sender>
+   <signal>clicked()</signal>
+   <receiver>dlgSettings</receiver>
+   <slot>onAddProfile()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>21</x>
+     <y>21</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>199</x>
+     <y>224</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionRemoveProfile</sender>
+   <signal>clicked()</signal>
+   <receiver>dlgSettings</receiver>
+   <slot>onRemoveProfile()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>51</x>
+     <y>21</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>199</x>
+     <y>224</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
+ <slots>
+  <slot>onAddProfile()</slot>
+  <slot>onRemoveProfile()</slot>
+ </slots>
 </ui>

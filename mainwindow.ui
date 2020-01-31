@@ -13,10 +13,16 @@
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="images.qrc">
+    <normaloff>:/images/abStartupManager.png</normaloff>:/images/abStartupManager.png</iconset>
+  </property>
   <widget class="QWidget" name="centralWidget"/>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources/>
+ <resources>
+  <include location="images.qrc"/>
+ </resources>
  <connections/>
  <slots>
   <slot>onConnect()</slot>

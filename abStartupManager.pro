@@ -51,7 +51,9 @@ SOURCES += \
     mainwindow.cpp \
     wgtaddremovebtns.cpp \
     wgtsetting.cpp \
-    mailer.cpp
+    mailer.cpp \
+    dlgselectfromlist.cpp \
+    dlggetuserinput.cpp
 
 HEADERS += \
     mainwindow.h \
@@ -82,7 +84,9 @@ HEADERS += \
     generalsettingslayout.h \
     wgtaddremovebtns.h \
     wgtsetting.h \
-    mailer.h
+    mailer.h \
+    dlgselectfromlist.h \
+    dlggetuserinput.h
 
 FORMS += \
     mainwindow.ui \
@@ -90,7 +94,9 @@ FORMS += \
     wgtsetting.ui \
     wgtaddremovebtns.ui \
     dlgruncliapp.ui \
-    abmessagebox.ui
+    abmessagebox.ui \
+    dlgselectfromlist.ui \
+    dlggetuserinput.ui
 
 DISTFILES +=
 
