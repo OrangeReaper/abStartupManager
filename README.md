@@ -35,6 +35,10 @@ See the [Wiki](https://github.com/OrangeReaper/abStartupManager/wiki/Some-notes-
 
 - Add tooltip to show which server is connected on mouse hover
 
+## Changelog
+
+* v0.101.0 Profiles can be added and removed (but can't be used yet)
+
 ## Requires
 
 abStartupManager requires [openvpn](https://www.ovpn.com/en) to be installed, eg
