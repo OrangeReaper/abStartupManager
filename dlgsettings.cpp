@@ -3,6 +3,7 @@
 #include "clsettingshelper.h"
 #include "dlgselectfromlist.h"
 #include "dlggetuserinput.h"
+#include "mainwindow.h"
 
 #include <QMessageBox>
 #include <QStringList>
@@ -16,7 +17,7 @@ dlgSettings::dlgSettings(QWidget *parent) :
     m_generalSettingsLayout = new generalSettingsLayout();
     ui->tabGeneral->setLayout(m_generalSettingsLayout);
 
-    m_serverList = new fileListLayout(0, "Servers", "ovpn Files (*.ovpn)" );
+    m_serverList = new fileListLayout(0, MainWindow::defaultProfile(), "ovpn Files (*.ovpn)" );
     ui->tabServers->setLayout(m_serverList);
 
     ui->actionRemoveProfile->setEnabled(loadProfiles());
@@ -43,7 +44,7 @@ void dlgSettings::onAddProfile(){
 bool dlgSettings::profileNameOK(QString name){
     QString result="OK";
     QStringList notAllowed;
-    notAllowed << "Servers" << "General";
+    notAllowed << MainWindow::defaultProfile() << "General";
     if (m_profile_list.contains(name)) result = "Profile Name Already Exists" ;
     if (notAllowed.contains(name)) result = "Profile Name is Not Allowed (Reserved)";
     if (result == "OK"){
@@ -97,6 +98,7 @@ bool dlgSettings::saveProfileList(){
     m_settingsHelper.saveList("Profiles", m_profile_list);
     bool result = m_profile_list.size() > 0;
     ui->actionRemoveProfile->setEnabled(result);
+    emit profilesChanged();
     return result;
 }
 QStringList dlgSettings::getProfiles(){

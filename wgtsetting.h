@@ -17,6 +17,10 @@ public:
 public slots:
     void onAction();
     void onCancel();
+    void textChanged(QString text);
+signals:
+    void resize();
+
 private:
     Ui::wgtSetting *ui;
 

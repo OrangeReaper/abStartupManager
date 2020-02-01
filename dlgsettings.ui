@@ -75,7 +75,7 @@
      </widget>
      <widget class="QWidget" name="tabServers">
       <attribute name="title">
-       <string>Servers</string>
+       <string>Default</string>
       </attribute>
      </widget>
     </widget>

@@ -3,6 +3,8 @@
 #include "clsettings.h"
 #include "dlgsettings.h"
 #include "mailer.h"
+#include "clsettingshelper.h"
+#include "abqaction.h"
 
 #include <QCoreApplication>
 #include <QHBoxLayout>
@@ -18,7 +20,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    setToolTip("v0.102.0");
+   setToolTip("v0.103.0");
 
     QCoreApplication::setOrganizationName("abondServices");//(Strings::organisationName);
     QCoreApplication::setOrganizationDomain("abondservices.co.uk");//(Strings::organisationDomain);
@@ -38,6 +40,10 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(a_status, SIGNAL(triggered()), this, SLOT(status()));
     pgmImage->menu()->addAction(a_status);
 
+    m_profile = new QMenu("Profile", this);
+    pgmImage->menu()->addMenu(m_profile);
+    populateProfileMenu();
+
     QAction * a_settings = new QAction("Settings", this);
     connect(a_settings, SIGNAL(triggered()), this, SLOT(settings()));
     pgmImage->menu()->addAction(a_settings);
@@ -56,6 +62,8 @@ MainWindow::MainWindow(QWidget *parent) :
     setCentralWidget(new QWidget);
     this->centralWidget()->setStyleSheet("background-color: rgba(255, 0, 0, 0)"); //Transparency
     centralWidget()->setLayout(layout);
+
+    m_currentProfile=defaultProfile();
 
     m_connectToVPN = connectToVPN::getInstance();
     vpnInterface = clVPNInterface::getInstance();   //Initialise VPN Interface Instance
@@ -78,6 +86,8 @@ MainWindow::~MainWindow()
     if (shutdownProcess != nullptr) delete shutdownProcess;
     if (shutdownCmdProcess != nullptr) delete shutdownCmdProcess;
     if (m_shutdownCmdStatus != nullptr) delete m_shutdownCmdStatus;
+
+    m_profile->deleteLater();
 }
 
 void MainWindow::mousePressEvent(QMouseEvent *event){
@@ -92,6 +102,34 @@ void MainWindow::mouseMoveEvent(QMouseEvent *event){
         this->move(newpos);
     }
 }
+void MainWindow::populateProfileMenu(){
+    //return;
+    m_profile->clear();
+
+    abQAction * action = new abQAction(defaultProfile(), this);
+    connect(action, SIGNAL(triggered(QString)), this, SLOT(selectProfile(QString)));
+    m_profile->addAction(action);
+
+    clSettingsHelper m_settingsHelper;
+    QStringList profiles=m_settingsHelper.getList("Profiles");
+    for (QString profile : profiles){
+        abQAction * newAction = new abQAction(profile, this);
+        connect(newAction, SIGNAL(triggered(QString)), this, SLOT(selectProfile(QString)));
+        m_profile->addAction(newAction);
+
+    }
+
+    m_profile->menuAction()->setVisible(profiles.count()>0);
+}
+void MainWindow::selectProfile(QString text){
+    if (m_currentProfile != text){
+        m_currentProfile=text;
+        nextVPNConnection=0;
+        switching=true;
+        m_connectToVPN->disconnectVPN();
+    }
+}
+
 void MainWindow::userClose(){
     QMessageBox::StandardButton reply;
       reply = QMessageBox::question(0, "Quit", "Do you want to Disconnect VPN?",
@@ -131,18 +169,15 @@ void MainWindow::doConnect(){
 }
 QString MainWindow::nextConnection(){
     clSettingsHelper settingsHelper;// = new clSettingsHelper();
-    QStringList m_list=settingsHelper.getList("Servers");
+    QStringList m_list=settingsHelper.getList(m_currentProfile);
     if (m_list.size() == 0) return "";
     if (nextVPNConnection >= m_list.size()) nextVPNConnection=0;
     return m_list.at(nextVPNConnection++);
 }
 void MainWindow::connect_vpn(QString openVPNCmd, QString ovpnFile, QString authFile){
     if (!m_closing){
-       // mu.lock();
         m_connectToVPN = connectToVPN::getInstance();
-        //if (!m_connectToVPN->isConnected())
-            m_connectToVPN->connectVPN(this, openVPNCmd, ovpnFile, authFile);
-        //mu.unlock();
+        m_connectToVPN->connectVPN(this, openVPNCmd, ovpnFile, authFile);
     }
 }
 void MainWindow::vpnConnected(bool isConnected){
@@ -150,7 +185,7 @@ void MainWindow::vpnConnected(bool isConnected){
     //Connect (if not connected) or monitor (if Connected)
     if (isConnected){
         qDebug() << "VPN is Connected";
-        QString logEntry= m_connectToVPN->currentConnection() + " Connected";
+        QString logEntry= getConnectionName() + " Connected";
         logSomething(logEntry);
         //The first time we get here we run the startup applications
         if (!monitoring) runStartupApps();
@@ -160,9 +195,15 @@ void MainWindow::vpnConnected(bool isConnected){
     } else {
          qDebug() << "VPN is Disconnected... Attempting to connect to VPN";
          pgmImage->loadImage(":/images/red_shield_icon.png");
-         if (monitoring) logDisconnection();
+         if (monitoring && !switching) logDisconnection();
+         switching=false;
          doConnect();
     }
+}
+QString MainWindow::getConnectionName(){
+    QString result=m_connectToVPN->currentConnection();
+    if (result == "") result = "Unknown Connection";
+    return result;
 }
 void MainWindow::emailServerFailures(){
     mailer mailFailures(m_connectionLog);
@@ -170,7 +211,7 @@ void MainWindow::emailServerFailures(){
 }
 void MainWindow::logDisconnection(){
     m_reportDisconnect=true;
-    QString logEntry= m_connectToVPN->currentConnection() + " Disconnected";
+    QString logEntry= getConnectionName() + " Disconnected";
     logSomething(logEntry);
 }
 void MainWindow::logSomething(QString logEntry){
@@ -199,14 +240,12 @@ void MainWindow::shutdown(){
     QString beforeShutdownRunInWindow = settings.value("beforeShutdownRunInWindow").toString();
 
     QFile file(beforeShutdownRunInWindow);
-    //if (file.exists()){
-        shutdownProcess = new QProcess(this);
-        connect(shutdownProcess, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(runShutdownCmd()));
-        m_shutdownCmdStatus = new dlgRunCLIApp(this, shutdownProcess, beforeShutdownRunInWindow, true, false);
-        m_shutdownCmdStatus->show();
-    //} else {
-    //    runShutdownCmd();
-    //}
+
+    shutdownProcess = new QProcess(this);
+    connect(shutdownProcess, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(runShutdownCmd()));
+    m_shutdownCmdStatus = new dlgRunCLIApp(this, shutdownProcess, beforeShutdownRunInWindow, true, false);
+    m_shutdownCmdStatus->show();
+
 
 }
 void MainWindow::runShutdownCmd(){
@@ -218,6 +257,7 @@ void MainWindow::runShutdownCmd(){
 }
 void MainWindow::settings(){
     dlgSettings dialog;
+    connect(&dialog, SIGNAL(profilesChanged()), this, SLOT(populateProfileMenu()) );
     dialog.exec();
 }
 void MainWindow::status(){

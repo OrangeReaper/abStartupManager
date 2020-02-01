@@ -20,6 +20,8 @@ public:
 public slots:
     void onAddProfile();
     void onRemoveProfile();
+signals:
+    void profilesChanged();
 
 private:
     Ui::dlgSettings *ui;

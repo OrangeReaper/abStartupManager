@@ -53,7 +53,8 @@ SOURCES += \
     wgtsetting.cpp \
     mailer.cpp \
     dlgselectfromlist.cpp \
-    dlggetuserinput.cpp
+    dlggetuserinput.cpp \
+    abqaction.cpp
 
 HEADERS += \
     mainwindow.h \
@@ -86,7 +87,8 @@ HEADERS += \
     wgtsetting.h \
     mailer.h \
     dlgselectfromlist.h \
-    dlggetuserinput.h
+    dlggetuserinput.h \
+    abqaction.h
 
 FORMS += \
     mainwindow.ui \

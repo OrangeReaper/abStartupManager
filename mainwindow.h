@@ -27,6 +27,8 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+    static QString defaultProfile() { return "Default"; }
+
 protected:
       void mousePressEvent(QMouseEvent *event);
       void mouseMoveEvent(QMouseEvent *event);
@@ -40,10 +42,12 @@ public slots:
     void vpnAlarm();
     void runShutdownCmd();
     void userClose();
+    void populateProfileMenu();
+    void selectProfile(QString text);
 private:
     Ui::MainWindow *ui;
 
-    QString nextConnection();
+
 
     void connect_vpn(QString openVPNCmd, QString ovpnFile, QString authFile);
     void startPollingVPNInterface();
@@ -55,6 +59,7 @@ private:
     void logSomething(QString logEntry);
 
     bool monitoring=false;
+    bool switching=false;
     bool m_closing=false;
     bool m_reportDisconnect=false;
 
@@ -72,8 +77,13 @@ private:
     QProcess * shutdownCmdProcess=nullptr;
 
     QStringList m_connectionLog;
+    QString m_currentProfile;
+    QString getConnectionName();
+    QString nextConnection();
 
     dlgRunCLIApp * m_shutdownCmdStatus = nullptr;
+
+    QMenu * m_profile = nullptr;
 
 
 };

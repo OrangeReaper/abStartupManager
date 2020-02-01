@@ -31,8 +31,6 @@ See the [Wiki](https://github.com/OrangeReaper/abStartupManager/wiki/Some-notes-
 
 - Detect if connection to router is present and act accordingly
 
-- remove unused setting 'priveligedDir'
-
 - improve settings display
 
 - Add tooltip to show which server is connected on mouse hover
@@ -43,9 +41,11 @@ See the [Wiki](https://github.com/OrangeReaper/abStartupManager/wiki/Some-notes-
 
 ## Changelog
 
-* v0.101.0 Profiles can be added and removed (but can't be used yet)
+* v0.103.0 More settings improvements; User can now switch between profiles.
 
-* v0.102.0 Improve Setting Display; Improve VPN Connection maintenance; Prompt for disconnect on quit;
+* v0.102.0 Improve Setting Display; Improve VPN Connection maintenance; Prompt for disconnect on quit.
+
+* v0.101.0 Profiles can be added and removed (but can't be used yet).
 
 ## Requires
 
