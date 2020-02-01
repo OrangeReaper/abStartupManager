@@ -5,7 +5,7 @@ abStartupManager
 
 abStartupManager is a VPN, Startup and Shutdown Manager written using Qt for Ubuntu Desktop. 
 
-See the [Wiki](https://github.com/OrangeReaper/abStartupManager/wiki/Some-notes-on-Ubuntu-Desktop-Security) for some additional notes on Ubuntu Desktop Security. 
+See the [Wiki](https://github.com/OrangeReaper/abStartupManager/wiki) for some additional notes on Ubuntu Desktop Security.
 
 ## abStartupManager Supports
 
@@ -25,8 +25,6 @@ See the [Wiki](https://github.com/OrangeReaper/abStartupManager/wiki/Some-notes-
 
 ## ToDo
 
-- Add profiles (to allow switching between geographical regions)
-
 - Add 'About' dialog
 
 - Detect if connection to router is present and act accordingly
@@ -38,6 +36,8 @@ See the [Wiki](https://github.com/OrangeReaper/abStartupManager/wiki/Some-notes-
 - Add logging (VPN Connection Logs)
 
 - Add Logging (Shutdown Script Logging)
+
+- TBC scan ovpn file for virtual network device type (tunX/tapX/null)
 
 ## Changelog
 
@@ -68,9 +68,16 @@ Add the following lines
 ```
   USER ALL=(root) NOPASSWD: /usr/sbin/openvpn
   USER ALL=(root) NOPASSWD: /usr/bin/killall
+  USER ALL=(root) NOPASSWD: /sbin/shutdown
 ```
 
 Change *USER* to the user you wish to add the permission
+
+If you choose to run abStartupManager as from Ubuntu *Startup Applications* then, in keeping with any program that requires X to be initialised before running you should use a command similar to
+
+```
+/bin/bash -c "sleep 15 && /usr/bin/abStartupManager"
+```
 
 ## Credits
 
