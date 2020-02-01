@@ -16,7 +16,7 @@ public:
     void disconnectVPN();
     void showStatus();
 
-    bool isConnected() { return m_connected; }
+    //bool isConnected() { return m_connected; }
     bool hasFailed()   { return m_failed; }
 
     QString currentConnection(){ return m_currentConnection; }
@@ -29,9 +29,9 @@ private:
     connectToVPN(){}
     static connectToVPN *s_instance;
 
-    bool m_connected = false;
+    //bool m_connected = false;
     bool m_failed = false;
-    bool m_issueAlarm = false;
+    //bool m_issueAlarm = false;
 
     void killVPNConnections();
 //    void killProcess();

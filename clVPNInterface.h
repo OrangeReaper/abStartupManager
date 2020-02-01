@@ -54,6 +54,7 @@ private:
 
     void notify(bool status);
     void startTimer();
+    void sendAlarm();
 
     QString lclVPNAddress="0:0:0:0";
 

@@ -14,6 +14,7 @@
 #include "clVPNInterface.h"
 
 #include <QNetworkInterface>
+#include "connecttovpn.h"
 
 
 clVPNInterface* clVPNInterface::s_instance = 0;
@@ -39,10 +40,16 @@ void clVPNInterface::pollVPN(){
     if (!vpnIsConnected()) {
         m_alarmCountdown--;
         if (m_alarmCountdown <= 0){
-            m_alarmCountdown = m_alarmAfter;
-            emit vpnAlarm();
+            sendAlarm();
+        } else {
+            connectToVPN * m_connectToVPN = connectToVPN::getInstance();
+            if (m_connectToVPN->hasFailed()) emit vpnAlarm();
         }
     }
+}
+void clVPNInterface::sendAlarm(){
+    m_alarmCountdown = m_alarmAfter;
+    emit vpnAlarm();
 }
 bool clVPNInterface::isVPNConnected(){
     QSettings settings;

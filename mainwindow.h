@@ -28,7 +28,6 @@ public:
     ~MainWindow();
 
 protected:
-      void showEvent(QShowEvent *ev);
       void mousePressEvent(QMouseEvent *event);
       void mouseMoveEvent(QMouseEvent *event);
       void closeEvent(QCloseEvent *event);
@@ -39,8 +38,8 @@ public slots:
     void shutdown();
     void vpnConnected(bool isConnected);
     void vpnAlarm();
-    void windowVisible();
     void runShutdownCmd();
+    void userClose();
 private:
     Ui::MainWindow *ui;
 
@@ -53,10 +52,11 @@ private:
     void doConnect();
     void logDisconnection();
     void emailServerFailures();
+    void logSomething(QString logEntry);
 
-    bool userIsRoot();
     bool monitoring=false;
     bool m_closing=false;
+    bool m_reportDisconnect=false;
 
     int nextVPNConnection=0;
 
@@ -71,9 +71,10 @@ private:
     QProcess * shutdownProcess=nullptr;
     QProcess * shutdownCmdProcess=nullptr;
 
-    QStringList m_connectionFailures;
+    QStringList m_connectionLog;
 
     dlgRunCLIApp * m_shutdownCmdStatus = nullptr;
+
 
 };
 

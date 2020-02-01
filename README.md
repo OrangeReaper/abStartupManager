@@ -1,6 +1,8 @@
 abStartupManager
 ================
 
+**This application should be considered as being [in perpetual beta](https://en.wikipedia.org/wiki/Perpetual_beta) and may contain bugs.**
+
 abStartupManager is a VPN, Startup and Shutdown Manager written using Qt for Ubuntu Desktop. 
 
 See the [Wiki](https://github.com/OrangeReaper/abStartupManager/wiki/Some-notes-on-Ubuntu-Desktop-Security) for some additional notes on Ubuntu Desktop Security. 
@@ -35,9 +37,15 @@ See the [Wiki](https://github.com/OrangeReaper/abStartupManager/wiki/Some-notes-
 
 - Add tooltip to show which server is connected on mouse hover
 
+- Add logging (VPN Connection Logs)
+
+- Add Logging (Shutdown Script Logging)
+
 ## Changelog
 
 * v0.101.0 Profiles can be added and removed (but can't be used yet)
+
+* v0.102.0 Improve Setting Display; Improve VPN Connection maintenance; Prompt for disconnect on quit;
 
 ## Requires
 

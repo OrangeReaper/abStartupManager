@@ -17,7 +17,7 @@ mailer::~mailer(){
     smtp->deleteLater();
 }
 void mailer::run(){
-    QString t_message="The following servers disconnected or failed to connect.\n";
+    QString t_message="Some servers disconnected or failed to connect.\n";
     if (m_message.length() > 0){
         qDebug() << t_message;
         for (auto str : m_message){
@@ -34,7 +34,7 @@ void mailer::run(){
 
         message.setSender(new EmailAddress(smtpUser, "abStartupManager"));
         message.addRecipient(new EmailAddress(recipientEmail, recipientName));
-        message.setSubject("VPN Server Failure Report");
+        message.setSubject("VPN Server Event Report");
 
         // Now add some text to the email.
         // First we create a MimeText object.
