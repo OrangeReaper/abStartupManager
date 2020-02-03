@@ -29,10 +29,6 @@ See the [Wiki](https://github.com/OrangeReaper/abStartupManager/wiki) for some a
 
 - Detect if connection to router is present and act accordingly
 
-- improve settings display
-
-- Add tooltip to show which server is connected on mouse hover
-
 - Add logging (VPN Connection Logs)
 
 - Add Logging (Shutdown Script Logging)
@@ -71,12 +67,12 @@ Add the following lines
   USER ALL=(root) NOPASSWD: /sbin/shutdown
 ```
 
-Change *USER* to the user you wish to add the permission
+Change *USER* to the user you wish to add the permission.
 
 If you choose to run abStartupManager as from Ubuntu *Startup Applications* then, in keeping with any program that requires X to be initialised before running you should use a command similar to
 
 ```
-/bin/bash -c "sleep 15 && /usr/bin/abStartupManager"
+/bin/bash -c "while [ ! xset q &>/dev/null ]; do sleep 5; done && /usr/bin/abStartupManager"
 ```
 
 ## Credits
