@@ -77,7 +77,7 @@ If you choose to run abStartupManager as from Ubuntu *Startup Applications* then
 
 ## Installation
 
-(Download the deb file)[https://github.com/OrangeReaper/abStartupManager/blob/master/deb/abStartupManager_0.103.1_amd64.deb] and install using (eg)
+[Download the deb file](https://github.com/OrangeReaper/abStartupManager/blob/master/deb/abStartupManager_0.103.1_amd64.deb) and install using (eg)
 
 ```
 $ sudo dpkg -i /path/to/abStartupManager_0.103.1_amd64.deb
