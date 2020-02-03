@@ -75,6 +75,14 @@ If you choose to run abStartupManager as from Ubuntu *Startup Applications* then
 /bin/bash -c "while [ ! xset q &>/dev/null ]; do sleep 5; done && /usr/bin/abStartupManager"
 ```
 
+## Installation
+
+(Download the deb file)[https://github.com/OrangeReaper/abStartupManager/blob/master/deb/abStartupManager_0.103.1_amd64.deb] and install using (eg)
+
+```
+$ sudo dpkg -i /path/to/abStartupManager_0.103.1_amd64.deb
+```
+
 ## Credits
 
 - Mailer function courtesy [bluetiger9](https://github.com/bluetiger9) cf [SmtpClient-for-Qt](https://github.com/bluetiger9/SmtpClient-for-Qt)
