@@ -1,6 +1,7 @@
 #include "mailer.h"
 #include <QDebug>
 #include <QSettings>
+#include <QHostInfo>
 
 mailer::mailer(QStringList message)
 {
@@ -32,7 +33,8 @@ void mailer::run(){
 
         MimeMessage message;
 
-        message.setSender(new EmailAddress(smtpUser, "abStartupManager"));
+        QString sender = "abStartupManager@" + QHostInfo::localHostName();
+        message.setSender(new EmailAddress(smtpUser, sender));
         message.addRecipient(new EmailAddress(recipientEmail, recipientName));
         message.setSubject("VPN Server Event Report");
 

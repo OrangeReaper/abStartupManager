@@ -6,7 +6,7 @@
     "geometry":"@ByteArray(\x1\xd9\xd0\xcb\0\x2\0\0\0\0\0\x80\0\0\0]\0\0\0\xc3\0\0\0\xa0\0\0\0\x80\0\0\0]\0\0\0\xc3\0\0\0\xa0\0\0\0\0\0\0\0\0\n\0)",
     "windowState":"@ByteArray(\0\0\0\xff\0\0\0\0\xfd\0\0\0\0\0\0\0\x44\0\0\0\x44\0\0\0\x4\0\0\0\x4\0\0\0\b\0\0\0\b\xfc\0\0\0\0)",
     "vpnAlarmAfter":"30",
-    "openVPNCmd":"/usr/sbin/openvpn",
+    "openVPNCmd":"sudo /usr/sbin/openvpn",
     "authFile":"",
     "onFirstConnectRunDetached":"",
     "beforeShutdownRunInWindow":"",

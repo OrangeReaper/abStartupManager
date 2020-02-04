@@ -5,6 +5,7 @@
 #include "mailer.h"
 #include "clsettingshelper.h"
 #include "abqaction.h"
+#include "abfunctions.h"
 
 #include <QCoreApplication>
 #include <QHBoxLayout>
@@ -20,7 +21,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-   setToolTip("v0.103.1");
+   setToolTip("v0.103.2");
 
     QCoreApplication::setOrganizationName("abondServices");//(Strings::organisationName);
     QCoreApplication::setOrganizationDomain("abondservices.co.uk");//(Strings::organisationDomain);
@@ -175,7 +176,7 @@ QString MainWindow::nextConnection(){
     return m_list.at(nextVPNConnection++);
 }
 void MainWindow::connect_vpn(QString openVPNCmd, QString ovpnFile, QString authFile){
-    if (!m_closing){
+    if (!m_closing && abFunctions::fileExists(ovpnFile) && abFunctions::fileExists(authFile) ){
         m_connectToVPN = connectToVPN::getInstance();
         m_connectToVPN->connectVPN(this, openVPNCmd, ovpnFile, authFile);
     }
