@@ -21,7 +21,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-   setToolTip("v0.103.2");
+   setToolTip("v0.103.3");
 
     QCoreApplication::setOrganizationName("abondServices");//(Strings::organisationName);
     QCoreApplication::setOrganizationDomain("abondservices.co.uk");//(Strings::organisationDomain);
@@ -233,19 +233,20 @@ void MainWindow::runStartupApps(){
 
 }
 void MainWindow::runCmdDetached(QProcess * p, QString cmd){
-    QFile file(cmd);
-    p->startDetached(cmd);
+    if (abFunctions::fileExists(cmd)) p->startDetached(cmd);
 }
 void MainWindow::shutdown(){
     QSettings settings;
     QString beforeShutdownRunInWindow = settings.value("beforeShutdownRunInWindow").toString();
 
-    QFile file(beforeShutdownRunInWindow);
+    if (abFunctions::fileExists(beforeShutdownRunInWindow)){
 
-    shutdownProcess = new QProcess(this);
-    connect(shutdownProcess, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(runShutdownCmd()));
-    m_shutdownCmdStatus = new dlgRunCLIApp(this, shutdownProcess, beforeShutdownRunInWindow, true, false);
-    m_shutdownCmdStatus->show();
+        shutdownProcess = new QProcess(this);
+        connect(shutdownProcess, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(runShutdownCmd()));
+        m_shutdownCmdStatus = new dlgRunCLIApp(this, shutdownProcess, beforeShutdownRunInWindow, true, false);
+        m_shutdownCmdStatus->show();
+
+    } else runShutdownCmd();
 
 
 }
