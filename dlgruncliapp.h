@@ -13,7 +13,7 @@ class dlgRunCLIApp : public QDialog
     Q_OBJECT
 
 public:
-    explicit dlgRunCLIApp(QWidget *parent = 0, QProcess * process = nullptr, QString command="", bool userCanAbort=true, bool runDetached=false);
+    explicit dlgRunCLIApp(QWidget *parent = 0, QProcess * process = nullptr, QString command="", bool userCanAbort=true, bool runDetached=false, QStringList abort=QStringList());
     ~dlgRunCLIApp();
 public slots:
     void abortProcess();
@@ -22,6 +22,9 @@ public slots:
 private:
     Ui::dlgRunCLIApp *ui;
     QProcess * m_process;
+    QStringList m_abort;
+    bool aborting=false;
+    void abortProcess(QString line);
 };
 
 #endif // DLGRUNCLIAPP_H

@@ -15,6 +15,15 @@ void abFunctions::waitFor(int secs){
         QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
 }
 bool abFunctions::fileExists(QString path){
-    QFile file(path);
+    QStringList list = path.split(" ");
+    if (list.length()==0) return false;
+    QString fullPath;
+    if (list[0]=="sudo"){
+        if (list.length()<2) return false;
+        fullPath=list[1];
+    } else {
+        fullPath=list[0];
+    }
+    QFile file(fullPath);
     return file.exists();
 }

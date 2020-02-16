@@ -6,7 +6,7 @@
 #include <QTextStream>
 #include <QScreen>
 
-dlgRunCLIApp::dlgRunCLIApp(QWidget *parent, QProcess *process, QString command, bool userCanAbort, bool runDetached) :
+dlgRunCLIApp::dlgRunCLIApp(QWidget *parent, QProcess *process, QString command, bool userCanAbort, bool runDetached, QStringList abort) :
     QDialog(parent),
     ui(new Ui::dlgRunCLIApp)
 {
@@ -29,7 +29,7 @@ dlgRunCLIApp::dlgRunCLIApp(QWidget *parent, QProcess *process, QString command, 
 
     // set window position
     setGeometry(QRect(topLeft, size));
-
+    m_abort=abort;
     m_process = process;
     connect(m_process,SIGNAL(readyReadStandardOutput()), this, SLOT(readyReadStandardOutput()));
     if (runDetached){
@@ -49,10 +49,21 @@ void dlgRunCLIApp::readyReadStandardOutput(){
     while (!stream.atEnd()) {
         QString line = stream.readLine();
         ui->output->addItem(line);
+        abortProcess(line);
     }
 }
-
+void dlgRunCLIApp::abortProcess(QString line){
+    if (!aborting){
+        for (QString item : m_abort){
+            if (line.contains(item, Qt::CaseInsensitive)){
+                abortProcess();
+                break;
+            }
+        }
+    }
+}
 void dlgRunCLIApp::abortProcess(){
+    aborting=true;
     m_process->kill();
     m_process->waitForFinished();
     ui->output->addItem("Process terminated");
