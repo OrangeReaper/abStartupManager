@@ -22,6 +22,7 @@ public:
 
 public slots:
     void on_process_finished();
+    void killVPNConnections();
 signals:
     void connectionLost();
 private:
@@ -30,7 +31,7 @@ private:
 
     bool m_failed = false;
 
-    void killVPNConnections();
+
     void killWindow();
 
     QProcess * p_connect=nullptr;

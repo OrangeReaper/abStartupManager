@@ -29,7 +29,10 @@ void connectToVPN::connectVPN(QWidget * parent, QString openVPNCmd, QString ovpn
 
         connect(p_connect, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(on_process_finished()));
 
-        m_openVPNStatus = new dlgRunCLIApp(0, p_connect, program, false, false);
+        QStringList abortOn;
+        abortOn << "TLS Error";
+        m_openVPNStatus = new dlgRunCLIApp(0, p_connect, program, false, false, abortOn);
+        connect(m_openVPNStatus, SIGNAL(abort()), this, SLOT(killVPNConnections()));
 
         m_currentConnection=ovpnFile.mid(ovpnFile.lastIndexOf("/"));
 
@@ -45,7 +48,7 @@ void connectToVPN::on_process_finished(){
 
 void connectToVPN::killWindow(){
     if (m_openVPNStatus != nullptr) {
-        delete m_openVPNStatus;
+        m_openVPNStatus->deleteLater();
         m_openVPNStatus=nullptr;
     }
 }

@@ -18,6 +18,8 @@ public:
 public slots:
     void abortProcess();
     void readyReadStandardOutput();
+signals:
+    void abort();
 
 private:
     Ui::dlgRunCLIApp *ui;

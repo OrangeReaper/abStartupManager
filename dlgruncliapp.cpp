@@ -65,6 +65,7 @@ void dlgRunCLIApp::abortProcess(QString line){
 void dlgRunCLIApp::abortProcess(){
     aborting=true;
     m_process->kill();
+    emit abort();
     m_process->waitForFinished();
     ui->output->addItem("Process terminated");
 }

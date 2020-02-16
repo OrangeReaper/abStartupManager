@@ -50,6 +50,11 @@ abStartupManager requires [openvpn](https://www.ovpn.com/en) to be installed, eg
 ```
   $ sudo apt install openvpn
 ```
+abStartupManager requires qt5-default to be installed, eg
+
+```
+  $ sudo apt install qt5-default
+```
 
 ## Warnings
 
@@ -77,7 +82,7 @@ If you choose to run abStartupManager as from Ubuntu *Startup Applications* then
 
 ## Installation
 
-[Download the deb file](https://github.com/OrangeReaper/abStartupManager/blob/master/deb/abStartupManager_0.103.2_amd64.deb) and install using (eg)
+[Download the deb file from here](https://github.com/OrangeReaper/abStartupManager/tree/master/deb) and install using (eg)
 
 ```
 $ sudo dpkg -i /path/to/abStartupManager_0.103.2_amd64.deb
