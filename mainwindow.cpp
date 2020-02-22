@@ -21,7 +21,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-   setToolTip("v0.103.6");
+   setToolTip("v0.103.7");
 
     QCoreApplication::setOrganizationName("abondServices");//(Strings::organisationName);
     QCoreApplication::setOrganizationDomain("abondservices.co.uk");//(Strings::organisationDomain);

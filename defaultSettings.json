@@ -15,6 +15,7 @@
     "smtpPassword":"",
     "recipientEmail":"",
     "recipientName":"",
-    "smtpServer":"smtp.gmail.com"
+    "smtpServer":"smtp.gmail.com",
+    "abortIf":"TLS Error,Restart pause"
   }
 }

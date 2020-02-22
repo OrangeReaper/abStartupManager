@@ -29,8 +29,8 @@ void connectToVPN::connectVPN(QWidget * parent, QString openVPNCmd, QString ovpn
 
         connect(p_connect, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(on_process_finished()));
 
-        QStringList abortOn;
-        abortOn << "TLS Error";
+        QSettings settings;
+        QStringList abortOn=settings.value("abortIf").toString().split(",");
         m_openVPNStatus = new dlgRunCLIApp(0, p_connect, program, false, false, abortOn);
         connect(m_openVPNStatus, SIGNAL(abort()), this, SLOT(killVPNConnections()));
 
