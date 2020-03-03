@@ -14,7 +14,7 @@ public:
     ~mailer();
     void run();
 private slots:
-    void smtpError(SmtpClient::SmtpError e);
+
 private:
     QStringList m_message;
     SmtpClient * smtp;

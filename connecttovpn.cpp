@@ -1,16 +1,16 @@
 #include "connecttovpn.h"
-#include "clVPNInterface.h"
 #include "abfunctions.h"
 
 #include <QMessageBox>
 #include <QTextStream>
+#include <QSettings>
 #include <QDebug>
 
 connectToVPN* connectToVPN::s_instance = 0;
 
 connectToVPN* connectToVPN::getInstance(){
     if(!s_instance) {
-        s_instance = new connectToVPN();
+        s_instance = new connectToVPN();;
         // There is no instance so we created one.
         return s_instance;
     } else {
@@ -22,32 +22,27 @@ connectToVPN::~connectToVPN()
 {
     killWindow();
 }
-void connectToVPN::connectVPN(QWidget * parent, QString openVPNCmd, QString ovpnFile, QString authFile){
-    m_failed=false;
-    if (!clVPNInterface::getInstance()->vpnIsConnected()){
-        disconnectVPN();
-        //needs super user privileges!!!
-        QString program = openVPNCmd + " --config " + ovpnFile + " --auth-user-pass " + authFile;
+void connectToVPN::connectVPN( QString openVPNCmd, QString ovpnFile, QString authFile){
 
-        p_connect = new QProcess(this);
+    disconnectVPN();
+    //needs super user privileges!!!
+    QString program = openVPNCmd + " --config " + ovpnFile + " --auth-user-pass " + authFile;
 
-        connect(p_connect, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(on_process_finished()));
+    p_connect = new QProcess(this);
 
-        QSettings settings;
-        QStringList abortOn=settings.value("abortIf").toString().split(",");
-        m_openVPNStatus = new dlgRunCLIApp(0, p_connect, program, false, false, abortOn);
-        connect(m_openVPNStatus, SIGNAL(abort()), this, SLOT(killVPNConnections()));
+    connect(p_connect, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(on_process_finished()));
 
-        m_currentConnection=ovpnFile.mid(ovpnFile.lastIndexOf("/"));
+    QSettings settings;
+    QStringList abortOn=settings.value("abortIf").toString().split(",");
+    m_openVPNStatus = new dlgRunCLIApp(0, p_connect, program, false, false, abortOn);
+    connect(m_openVPNStatus, SIGNAL(abort()), this, SLOT(killVPNConnections()));
 
-    } else {
-        qDebug() << "Attempt to connect to VPN was made when VPN already connected";
-    }
+    m_currentConnection=ovpnFile.mid(ovpnFile.lastIndexOf("/"));
 }
 
 void connectToVPN::on_process_finished(){
     killWindow();
-    m_failed=true;
+//    m_failed=true;
 }
 
 void connectToVPN::killWindow(){

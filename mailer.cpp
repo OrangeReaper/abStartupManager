@@ -20,9 +20,7 @@ mailer::~mailer(){
 void mailer::run(){
     QString t_message="Some servers disconnected or failed to connect.\n";
     if (m_message.length() > 0){
-        qDebug() << t_message;
         for (auto str : m_message){
-            qDebug() << str;
             t_message=t_message + "\n" + str;
         }
 
@@ -51,19 +49,10 @@ void mailer::run(){
 
         // Now we can send the mail
 
-        connect(smtp, SIGNAL(smtpError(SmtpClient::SmtpError e)), this, SLOT(smtpError(SmtpClient::SmtpError e)));
-
-        qDebug() << "servers disconnected or failed to connect: Mailer Response";
         smtp->connectToHost();
-        qDebug() << "Connect Response: " << smtp->getResponseText();
         smtp->login();
-        qDebug() << "Login Response: " << smtp->getResponseText();
         smtp->sendMail(message);
-        qDebug() << "After Send Response: " << smtp->getResponseText();
         smtp->quit();
-        qDebug() << "After Quit Response: " << smtp->getResponseText();
     }
 }
-void mailer::smtpError(SmtpClient::SmtpError e){
-    qDebug() << smtp->getResponseText();
-}
+

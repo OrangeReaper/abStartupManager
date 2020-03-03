@@ -21,7 +21,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-   setToolTip("v0.104.1");
+   setToolTip("v0.104.2");
 
     QCoreApplication::setOrganizationName("abondServices");//(Strings::organisationName);
     QCoreApplication::setOrganizationDomain("abondservices.co.uk");//(Strings::organisationDomain);
@@ -68,33 +68,17 @@ MainWindow::MainWindow(QWidget *parent) :
 
     m_currentProfile=defaultProfile();
 
-    pingTestVPN = new clpingtestvpn(this);
 
     m_connectToVPN = connectToVPN::getInstance();
-    vpnInterface = clVPNInterface::getInstance();   //Initialise VPN Interface Instance
-    connect(m_connectToVPN, SIGNAL(connectionLost()), vpnInterface, SLOT(forceNotify()));
-    connect(vpnInterface, SIGNAL(vpnConnected(bool)), this, SLOT(vpnConnected(bool)));
-    connect(vpnInterface, SIGNAL(vpnAlarm()), this, SLOT(vpnAlarm()));
-    VPNTimer = new QTimer(this);
-    connect(VPNTimer, SIGNAL(timeout()), vpnInterface, SLOT(pollVPN()) );
-    vpnInterface->forceNotify();
-    startPollingVPNInterface();
-
-
-
+    pingTestVPN = new clpingtestvpn(this);
+    connect(pingTestVPN, SIGNAL(vpnConnectionState(bool)), this, SLOT(vpnConnected(bool)));
+    pingTestVPN->monitorVPN(); // Start Monitoring
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
-    VPNTimer->deleteLater();
-
-    if (startUpProcess != nullptr) delete startUpProcess;
-    if (shutdownProcess != nullptr) delete shutdownProcess;
-    if (shutdownCmdProcess != nullptr) delete shutdownCmdProcess;
-    if (m_shutdownCmdStatus != nullptr) delete m_shutdownCmdStatus;
-
-    m_profile->deleteLater();
+    m_connectToVPN->deleteLater();
 }
 
 void MainWindow::mousePressEvent(QMouseEvent *event){
@@ -141,7 +125,7 @@ void MainWindow::userClose(){
     QMessageBox::StandardButton reply;
       reply = QMessageBox::question(0, "Quit", "Do you want to Disconnect VPN?",
                                     QMessageBox::Yes|QMessageBox::No);
-      m_connectToVPN = connectToVPN::getInstance();
+      //m_connectToVPN = connectToVPN::getInstance();
       if (reply == QMessageBox::Yes) {          
         m_connectToVPN->disconnectVPN();
       } else {
@@ -155,16 +139,6 @@ void MainWindow::closeEvent(QCloseEvent *event) {
     settings.setValue("geometry", saveGeometry());
     settings.setValue("windowState", saveState());
     QMainWindow::closeEvent(event);
-}
-void MainWindow::startPollingVPNInterface(){
-
-
-    QSettings settings;
-    int pollPeriod = settings.value("pollVPNEvery").toInt();
-    int vpnAlarm = (settings.value("vpnAlarmAfter").toInt() / (pollPeriod/1000) ) + 1;
-    vpnInterface->setAlarm(vpnAlarm);
-    VPNTimer->start(pollPeriod);
-
 }
 
 void MainWindow::doConnect(){
@@ -183,8 +157,8 @@ QString MainWindow::nextConnection(){
 }
 void MainWindow::connect_vpn(QString openVPNCmd, QString ovpnFile, QString authFile){
     if (!m_closing && abFunctions::fileExists(ovpnFile) && abFunctions::fileExists(authFile) ){
-        m_connectToVPN = connectToVPN::getInstance();
-        m_connectToVPN->connectVPN(this, openVPNCmd, ovpnFile, authFile);
+        //m_connectToVPN = connectToVPN::getInstance();
+        m_connectToVPN->connectVPN(openVPNCmd, ovpnFile, authFile);
     }
 }
 void MainWindow::vpnConnected(bool isConnected){
@@ -192,8 +166,6 @@ void MainWindow::vpnConnected(bool isConnected){
     //Connect (if not connected) or monitor (if Connected)
     if (isConnected){
         qDebug() << "VPN is Connected";
-        VPNTimer->stop(); //Stop Monitoring using clVPNInterface
-        pingTestVPN->monitorVPN();
         QString logEntry= getConnectionName() + " Connected";
         logSomething(logEntry);
         //The first time we get here we run the startup applications
@@ -206,7 +178,6 @@ void MainWindow::vpnConnected(bool isConnected){
          pgmImage->loadImage(":/images/red_shield_icon.png");
          if (monitoring && !switching) logDisconnection();
          switching=false;
-         startPollingVPNInterface(); //using clVPNInterface
          doConnect();
     }
 }
@@ -229,15 +200,11 @@ void MainWindow::logSomething(QString logEntry){
     QString log=QDateTime::currentDateTime().toString(format) + " " + logEntry;
     m_connectionLog.append(log);
 }
-void MainWindow::vpnAlarm(){
-    // Here if m_connectToVPN detects a disconnect or the VPNInterface Alarm goes off
-    vpnConnected(false); // Force next connection when vpnDisconnected for too long
-}
 
 void MainWindow::runStartupApps(){
     QSettings settings;
     QString onFirstConnectRunDetached = settings.value("onFirstConnectRunDetached").toString();
-    startUpProcess = new QProcess();
+    startUpProcess = new QProcess(this);
     runCmdDetached(startUpProcess, onFirstConnectRunDetached);
 
 }
@@ -262,7 +229,7 @@ void MainWindow::shutdown(){
 void MainWindow::runShutdownCmd(){
     QSettings settings;
     QString shutdownCmd = settings.value("shutdownCmd").toString();
-    shutdownCmdProcess = new QProcess();
+    shutdownCmdProcess = new QProcess(this);
     runCmdDetached(shutdownCmdProcess, shutdownCmd);
     close();
 }

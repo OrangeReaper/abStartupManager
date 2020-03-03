@@ -16,6 +16,7 @@
     "recipientEmail":"",
     "recipientName":"",
     "smtpServer":"smtp.gmail.com",
-    "abortIf":"TLS Error,Restart pause"
+    "abortIf":"TLS Error,Restart pause",
+    "pingAddr":"8.8.8.8"
   }
 }

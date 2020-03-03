@@ -27,40 +27,34 @@ See the [Wiki](https://github.com/OrangeReaper/abStartupManager/wiki) for some a
 
 - Add 'About' dialog
 
-- Detect if connection to router is present and act accordingly
-
-- Add logging (VPN Connection Logs)
-
-- Add Logging (Shutdown Script Logging)
-
 - TBC scan ovpn file for virtual network device type (tunX/tapX/null)
 
 ## Changelog
 
-**v0.104.0**\
-VPN Connection Logs and Shutdown Script Logging\
-Changed method that detects VPN Disconnection
+**v0.104.x**\
+- VPN Connection Logs and Shutdown Script Logging\
+- Changed method that detects VPN Disconnection
 
-**v0.103.0**\
-More settings improvements; User can now switch between profiles.
+**v0.103.x**\
+- More settings improvements; User can now switch between profiles.
 
-**v0.102.0**\
-Improve Setting Display; Improve VPN Connection maintenance; Prompt for disconnect on quit.
+**v0.102.x**\
+- Improve Setting Display; Improve VPN Connection maintenance; Prompt for disconnect on quit.
 
-**v0.101.0**\
-Profiles can be added and removed (but can't be used yet).
+**v0.101.x**\
+- Profiles can be added and removed (but can't be used yet).
 
 ## Requires
 
-abStartupManager requires [openvpn](https://www.ovpn.com/en) to be installed, eg
+abStartupManager has the following dependancies
+
+- [openvpn](https://www.ovpn.com/en) to be installed
+- qt5-default
+
+These can be installed as follows:
 
 ```
-  $ sudo apt install openvpn
-```
-abStartupManager requires qt5-default to be installed, eg
-
-```
-  $ sudo apt install qt5-default
+  $ sudo apt install -y openvpn qt5-default
 ```
 
 ## Warnings

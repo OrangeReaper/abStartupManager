@@ -12,24 +12,27 @@ class clpingtestvpn : public QObject
 public:
     explicit clpingtestvpn(QObject *parent = nullptr);
 
+    enum state {
+        UNKNOWN,
+        CONNECTED,
+        DISCONNECTED
+    };
+
 signals:
     void vpnConnectionState(bool connected);
 public slots:
     void monitorVPN();
-    void processIPCommand();
-    void ipCommandFinished();
     void pingCommandFinished(int exitCode);
     void doPing();
 
 private:
     QTimer * m_pingEvery;
-    QProcess * m_ipProcess;
     QString m_doPing;
     QProcess * m_pingProcess;
+    state m_state=UNKNOWN;
     static QString m_getVPNIPAddress(){ return "ip -4 addr show dev tun0"; }
-    QString vpnIPAddress;
-    void getIPAddr();
-    void setIPAddress(QString line);
+    QString pingAddress="";
+    void emitSignal(bool connected);
 
 };
 

@@ -38,7 +38,6 @@ SOURCES += \
     SmtpClient/src/smtpclient.cpp \
     abfunctions.cpp \
     abuiimage.cpp \
-    clVPNInterface.cpp \
     clsettings.cpp \
     clsettingshelper.cpp \
     connecttovpn.cpp \
@@ -75,7 +74,6 @@ HEADERS += \
     SmtpClient/src/smtpexports.h \
     abfunctions.h \
     abuiimage.h \
-    clVPNInterface.h \
     clsettings.h \
     clsettingshelper.h \
     connecttovpn.h \

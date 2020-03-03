@@ -12,11 +12,9 @@ class connectToVPN : public QObject  {
 public:    
     static connectToVPN *getInstance();
     ~connectToVPN();
-    void connectVPN(QWidget *parent=0, QString openVPNCmd="", QString ovpnFile="", QString authFile="");
+    void connectVPN(QString openVPNCmd="", QString ovpnFile="", QString authFile="");
     void disconnectVPN();
     void showStatus();
-
-    bool hasFailed()   { return m_failed; }
 
     QString currentConnection(){ return m_currentConnection; }
 
@@ -24,23 +22,15 @@ public slots:
     void on_process_finished();
     void killVPNConnections();
 signals:
-    void connectionLost();
 private:
-    connectToVPN(){}
+    connectToVPN(){} // Singleton Object
     static connectToVPN *s_instance;
-
-    bool m_failed = false;
-
 
     void killWindow();
 
     QProcess * p_connect=nullptr;
-
     QString m_currentConnection="";
-
     dlgRunCLIApp * m_openVPNStatus = nullptr;
-
-
 };
 
 #endif // CONNECTTOVPN_H

@@ -11,7 +11,6 @@
 #include <QThread>
 
 #include "connecttovpn.h"
-#include "clVPNInterface.h"
 #include "clpingtestvpn.h"
 #include "dlgruncliapp.h"
 #include "abuiimage.h"
@@ -40,7 +39,6 @@ public slots:
     void status();
     void shutdown();
     void vpnConnected(bool isConnected);
-    void vpnAlarm();
     void runShutdownCmd();
     void userClose();
     void populateProfileMenu();
@@ -51,7 +49,6 @@ private:
 
 
     void connect_vpn(QString openVPNCmd, QString ovpnFile, QString authFile);
-    void startPollingVPNInterface();
     void runStartupApps();
     void runCmdDetached(QProcess * p,QString cmd);
     void doConnect();
@@ -67,11 +64,9 @@ private:
     int nextVPNConnection=0;
 
     connectToVPN * m_connectToVPN = nullptr;
-    clVPNInterface * vpnInterface;
     abUIImage * pgmImage;
     clpingtestvpn * pingTestVPN;
 
-    QTimer * VPNTimer;
     QPoint m_pos; // For moving window without titlebar
 
     QProcess * startUpProcess=nullptr;
