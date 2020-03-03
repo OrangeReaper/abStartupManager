@@ -54,7 +54,8 @@ SOURCES += \
     mailer.cpp \
     dlgselectfromlist.cpp \
     dlggetuserinput.cpp \
-    abqaction.cpp
+    abqaction.cpp \
+    clpingtestvpn.cpp
 
 HEADERS += \
     mainwindow.h \
@@ -88,7 +89,8 @@ HEADERS += \
     mailer.h \
     dlgselectfromlist.h \
     dlggetuserinput.h \
-    abqaction.h
+    abqaction.h \
+    clpingtestvpn.h
 
 FORMS += \
     mainwindow.ui \

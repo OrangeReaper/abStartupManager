@@ -18,6 +18,10 @@ connectToVPN* connectToVPN::getInstance(){
         return s_instance;
     }
 }
+connectToVPN::~connectToVPN()
+{
+    killWindow();
+}
 void connectToVPN::connectVPN(QWidget * parent, QString openVPNCmd, QString ovpnFile, QString authFile){
     m_failed=false;
     if (!clVPNInterface::getInstance()->vpnIsConnected()){
@@ -47,7 +51,9 @@ void connectToVPN::on_process_finished(){
 }
 
 void connectToVPN::killWindow(){
+
     if (m_openVPNStatus != nullptr) {
+        m_openVPNStatus->close();
         m_openVPNStatus->deleteLater();
         m_openVPNStatus=nullptr;
     }

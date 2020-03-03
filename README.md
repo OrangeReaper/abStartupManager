@@ -37,11 +37,18 @@ See the [Wiki](https://github.com/OrangeReaper/abStartupManager/wiki) for some a
 
 ## Changelog
 
-* v0.103.0 More settings improvements; User can now switch between profiles.
+**v0.104.0**\
+VPN Connection Logs and Shutdown Script Logging\
+Changed method that detects VPN Disconnection
 
-* v0.102.0 Improve Setting Display; Improve VPN Connection maintenance; Prompt for disconnect on quit.
+**v0.103.0**\
+More settings improvements; User can now switch between profiles.
 
-* v0.101.0 Profiles can be added and removed (but can't be used yet).
+**v0.102.0**\
+Improve Setting Display; Improve VPN Connection maintenance; Prompt for disconnect on quit.
+
+**v0.101.0**\
+Profiles can be added and removed (but can't be used yet).
 
 ## Requires
 

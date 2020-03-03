@@ -12,6 +12,7 @@
 
 #include "connecttovpn.h"
 #include "clVPNInterface.h"
+#include "clpingtestvpn.h"
 #include "dlgruncliapp.h"
 #include "abuiimage.h"
 
@@ -68,6 +69,7 @@ private:
     connectToVPN * m_connectToVPN = nullptr;
     clVPNInterface * vpnInterface;
     abUIImage * pgmImage;
+    clpingtestvpn * pingTestVPN;
 
     QTimer * VPNTimer;
     QPoint m_pos; // For moving window without titlebar

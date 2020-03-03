@@ -21,7 +21,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-   setToolTip("v0.103.7");
+   setToolTip("v0.104.1");
 
     QCoreApplication::setOrganizationName("abondServices");//(Strings::organisationName);
     QCoreApplication::setOrganizationDomain("abondservices.co.uk");//(Strings::organisationDomain);
@@ -32,6 +32,8 @@ MainWindow::MainWindow(QWidget *parent) :
     QSettings settings;
     restoreGeometry(settings.value("geometry").toByteArray());
     restoreState(settings.value("windowState").toByteArray());
+
+
 
     int iconsize=settings.value("iconSize").toInt();
     pgmImage = new abUIImage(this, ":/images/red_shield_icon.png",iconsize,iconsize);
@@ -66,11 +68,15 @@ MainWindow::MainWindow(QWidget *parent) :
 
     m_currentProfile=defaultProfile();
 
+    pingTestVPN = new clpingtestvpn(this);
+
     m_connectToVPN = connectToVPN::getInstance();
     vpnInterface = clVPNInterface::getInstance();   //Initialise VPN Interface Instance
     connect(m_connectToVPN, SIGNAL(connectionLost()), vpnInterface, SLOT(forceNotify()));
     connect(vpnInterface, SIGNAL(vpnConnected(bool)), this, SLOT(vpnConnected(bool)));
     connect(vpnInterface, SIGNAL(vpnAlarm()), this, SLOT(vpnAlarm()));
+    VPNTimer = new QTimer(this);
+    connect(VPNTimer, SIGNAL(timeout()), vpnInterface, SLOT(pollVPN()) );
     vpnInterface->forceNotify();
     startPollingVPNInterface();
 
@@ -135,11 +141,11 @@ void MainWindow::userClose(){
     QMessageBox::StandardButton reply;
       reply = QMessageBox::question(0, "Quit", "Do you want to Disconnect VPN?",
                                     QMessageBox::Yes|QMessageBox::No);
-      if (reply == QMessageBox::Yes) {
-          m_connectToVPN = connectToVPN::getInstance();
-          m_connectToVPN->disconnectVPN();
+      m_connectToVPN = connectToVPN::getInstance();
+      if (reply == QMessageBox::Yes) {          
+        m_connectToVPN->disconnectVPN();
       } else {
-        //qDebug() << "Yes was *not* clicked";
+        m_connectToVPN->deleteLater();
       }
       close();
 }
@@ -151,14 +157,14 @@ void MainWindow::closeEvent(QCloseEvent *event) {
     QMainWindow::closeEvent(event);
 }
 void MainWindow::startPollingVPNInterface(){
-    VPNTimer = new QTimer(this);
-    connect(VPNTimer, SIGNAL(timeout()), vpnInterface, SLOT(pollVPN()) );
+
 
     QSettings settings;
     int pollPeriod = settings.value("pollVPNEvery").toInt();
     int vpnAlarm = (settings.value("vpnAlarmAfter").toInt() / (pollPeriod/1000) ) + 1;
     vpnInterface->setAlarm(vpnAlarm);
     VPNTimer->start(pollPeriod);
+
 }
 
 void MainWindow::doConnect(){
@@ -186,6 +192,8 @@ void MainWindow::vpnConnected(bool isConnected){
     //Connect (if not connected) or monitor (if Connected)
     if (isConnected){
         qDebug() << "VPN is Connected";
+        VPNTimer->stop(); //Stop Monitoring using clVPNInterface
+        pingTestVPN->monitorVPN();
         QString logEntry= getConnectionName() + " Connected";
         logSomething(logEntry);
         //The first time we get here we run the startup applications
@@ -198,6 +206,7 @@ void MainWindow::vpnConnected(bool isConnected){
          pgmImage->loadImage(":/images/red_shield_icon.png");
          if (monitoring && !switching) logDisconnection();
          switching=false;
+         startPollingVPNInterface(); //using clVPNInterface
          doConnect();
     }
 }

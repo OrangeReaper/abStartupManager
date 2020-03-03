@@ -5,6 +5,10 @@
 #include <QSettings>
 #include <QTextStream>
 #include <QScreen>
+#include <QDate>
+#include <QFile>
+#include <QStandardPaths>
+#include <QCoreApplication>
 
 dlgRunCLIApp::dlgRunCLIApp(QWidget *parent, QProcess *process, QString command, bool userCanAbort, bool runDetached, QStringList abort) :
     QDialog(parent),
@@ -32,6 +36,7 @@ dlgRunCLIApp::dlgRunCLIApp(QWidget *parent, QProcess *process, QString command, 
     m_abort=abort;
     m_process = process;
     connect(m_process,SIGNAL(readyReadStandardOutput()), this, SLOT(readyReadStandardOutput()));
+    connect(m_process, SIGNAL(finished(int)), this, SLOT(saveLog()));
     if (runDetached){
         m_process->startDetached(command);
     } else {
@@ -42,6 +47,9 @@ dlgRunCLIApp::dlgRunCLIApp(QWidget *parent, QProcess *process, QString command, 
 dlgRunCLIApp::~dlgRunCLIApp()
 {
     delete ui;
+}
+void dlgRunCLIApp::closeEvent(QCloseEvent *event) {
+    saveLog();
 }
 void dlgRunCLIApp::readyReadStandardOutput(){
     m_process->setReadChannel(QProcess::StandardOutput);
@@ -64,8 +72,34 @@ void dlgRunCLIApp::abortProcess(QString line){
 }
 void dlgRunCLIApp::abortProcess(){
     aborting=true;
+    saveLog();
     m_process->kill();
     emit abort();
     m_process->waitForFinished();
     ui->output->addItem("Process terminated");
 }
+
+void dlgRunCLIApp::saveLog(){
+    if (!logSaved){
+        logSaved=true;
+        QString path = QStandardPaths::writableLocation(QStandardPaths::ConfigLocation);
+        path = path + "/" + QCoreApplication::organizationName() + "/logs/abStartupManager";
+        if (abFunctions::mkdir(path)){
+            path = path + "/" + QDate::currentDate().toString("yyMMdd") + ".log";
+            QFile f(path);
+            if (f.open(QIODevice::WriteOnly | QIODevice::Append)) {
+                QString txt = "...\n" ;
+                f.write(txt.toUtf8());
+                for(int i = 0; i < ui->output->count(); ++i)
+                {
+                    QListWidgetItem* item = ui->output->item(i);
+                    txt = item->text() + "\n";
+                    f.write(txt.toUtf8());
+                }
+                f.close();
+            }
+        }
+    }
+}
+
+

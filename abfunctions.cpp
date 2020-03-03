@@ -2,6 +2,7 @@
 
 #include <QTime>
 #include <QFile>
+#include <QDir>
 #include <QCoreApplication>
 
 abFunctions::abFunctions()
@@ -26,4 +27,9 @@ bool abFunctions::fileExists(QString path){
     }
     QFile file(fullPath);
     return file.exists();
+}
+bool abFunctions::mkdir(QString path){
+    QDir dir(path);
+    if (!dir.exists()) dir.mkpath(".");
+    return dir.exists();
 }

@@ -9,6 +9,7 @@ public:
     abFunctions();
     static void waitFor(int secs);
     static bool fileExists(QString path);
+    static bool mkdir(QString path);
 };
 
 #endif // ABFUNCTIONS_H

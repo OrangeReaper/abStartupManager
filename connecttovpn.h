@@ -11,7 +11,7 @@ class connectToVPN : public QObject  {
     Q_OBJECT
 public:    
     static connectToVPN *getInstance();
-
+    ~connectToVPN();
     void connectVPN(QWidget *parent=0, QString openVPNCmd="", QString ovpnFile="", QString authFile="");
     void disconnectVPN();
     void showStatus();
