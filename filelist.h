@@ -25,6 +25,8 @@ private:
     QStringList m_list;
     QFileDialog * fileDialog;
 
+    void setColours();
+
 
 };
 

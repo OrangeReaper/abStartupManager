@@ -11,7 +11,6 @@
 #include <QHBoxLayout>
 #include <QThreadPool>
 #include <QFileInfo>
-#include <QTimer>
 #include <QDateTime>
 #include <QDebug>
 
@@ -21,7 +20,8 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-   setToolTip("v0.104.2");
+   setToolTip("v0.105.0");
+
 
     QCoreApplication::setOrganizationName("abondServices");//(Strings::organisationName);
     QCoreApplication::setOrganizationDomain("abondservices.co.uk");//(Strings::organisationDomain);
@@ -32,8 +32,6 @@ MainWindow::MainWindow(QWidget *parent) :
     QSettings settings;
     restoreGeometry(settings.value("geometry").toByteArray());
     restoreState(settings.value("windowState").toByteArray());
-
-
 
     int iconsize=settings.value("iconSize").toInt();
     pgmImage = new abUIImage(this, ":/images/red_shield_icon.png",iconsize,iconsize);
@@ -68,17 +66,18 @@ MainWindow::MainWindow(QWidget *parent) :
 
     m_currentProfile=defaultProfile();
 
-
     m_connectToVPN = connectToVPN::getInstance();
+    connect(m_connectToVPN, SIGNAL(failedToConnect()), this, SLOT(failedToConnect()));
+    connect(m_connectToVPN, SIGNAL(logSomething(QString)), this, SLOT(logSomething(QString)));
+    connect(m_connectToVPN, SIGNAL(connected()), this, SLOT(vpnConnected()));
+
     pingTestVPN = new clpingtestvpn(this);
-    connect(pingTestVPN, SIGNAL(vpnConnectionState(bool)), this, SLOT(vpnConnected(bool)));
+    connect(pingTestVPN, SIGNAL(vpnConnectionState(bool)), this, SLOT(pingStateChanged(bool)));
     pingTestVPN->monitorVPN(); // Start Monitoring
 }
 
-MainWindow::~MainWindow()
-{
+MainWindow::~MainWindow(){
     delete ui;
-    m_connectToVPN->deleteLater();
 }
 
 void MainWindow::mousePressEvent(QMouseEvent *event){
@@ -107,9 +106,7 @@ void MainWindow::populateProfileMenu(){
         abQAction * newAction = new abQAction(profile, this);
         connect(newAction, SIGNAL(triggered(QString)), this, SLOT(selectProfile(QString)));
         m_profile->addAction(newAction);
-
     }
-
     m_profile->menuAction()->setVisible(profiles.count()>0);
 }
 void MainWindow::selectProfile(QString text){
@@ -117,69 +114,96 @@ void MainWindow::selectProfile(QString text){
         m_currentProfile=text;
         nextVPNConnection=0;
         switching=true;
-        m_connectToVPN->disconnectVPN();
+        disconnectVPN();
     }
 }
-
-void MainWindow::userClose(){
-    QMessageBox::StandardButton reply;
-      reply = QMessageBox::question(0, "Quit", "Do you want to Disconnect VPN?",
-                                    QMessageBox::Yes|QMessageBox::No);
-      //m_connectToVPN = connectToVPN::getInstance();
-      if (reply == QMessageBox::Yes) {          
-        m_connectToVPN->disconnectVPN();
-      } else {
-        m_connectToVPN->deleteLater();
-      }
-      close();
+void MainWindow::disconnectVPN(){
+    m_connectToVPN->killVPNConnections();
+    pgmImage->loadImage(":/images/red_shield_icon.png");
 }
-void MainWindow::closeEvent(QCloseEvent *event) {
-    m_closing=true;
+void MainWindow::userClose(QMessageBox::StandardButton reply){
+    if (reply==QMessageBox::NoButton){
+        reply = QMessageBox::question(0, "Quit", "Do you want to Disconnect VPN?",
+                                    QMessageBox::Yes|QMessageBox::No);
+    }
+    if (reply == QMessageBox::Yes) {
+        pingTestVPN->stopMonitoring();
+        disconnectVPN();
+    } else {
+        m_connectToVPN->deleteLater();
+    }
+    saveWindowState();
+    QCoreApplication::quit();
+}
+void MainWindow::saveWindowState(){
     QSettings settings;
     settings.setValue("geometry", saveGeometry());
     settings.setValue("windowState", saveState());
-    QMainWindow::closeEvent(event);
 }
-
+void MainWindow::failedToConnect(){
+    QString logEntry= getConnectionName() + " Connection Failed";
+    logSomething(logEntry);
+    doConnect();
+}
 void MainWindow::doConnect(){
-
+    //try next connection in list
     QSettings settings;
     QString openVPNCmd = settings.value("openVPNCmd").toString();
     QString authFile = settings.value("authFile").toString();
     connect_vpn(openVPNCmd, nextConnection(), authFile);
+    m_connecting=true;
 }
 QString MainWindow::nextConnection(){
     clSettingsHelper settingsHelper;// = new clSettingsHelper();
     QStringList m_list=settingsHelper.getList(m_currentProfile);
     if (m_list.size() == 0) return "";
-    if (nextVPNConnection >= m_list.size()) nextVPNConnection=0;
+
+    while( fileListLayout::isBlacklisted(m_list.at(nextVPNConnection)))
+    {
+       if (nextVPNConnection >= m_list.size())
+           nextVPNConnection=0;
+       else nextVPNConnection++;
+    }
+
     return m_list.at(nextVPNConnection++);
 }
 void MainWindow::connect_vpn(QString openVPNCmd, QString ovpnFile, QString authFile){
-    if (!m_closing && abFunctions::fileExists(ovpnFile) && abFunctions::fileExists(authFile) ){
+    if (abFunctions::fileExists(ovpnFile) && abFunctions::fileExists(authFile) ){
         //m_connectToVPN = connectToVPN::getInstance();
         m_connectToVPN->connectVPN(openVPNCmd, ovpnFile, authFile);
     }
 }
-void MainWindow::vpnConnected(bool isConnected){
+void MainWindow::pingStateChanged(bool isConnected){
     //On Startup we should always arrive here and either
-    //Connect (if not connected) or monitor (if Connected)
-    if (isConnected){
+    if (!isConnected){
+        pgmImage->loadImage(":/images/red_shield_icon.png");
+
+        qDebug() << "VPN is Disconnected... Attempting to connect to VPN";
+        pingTestVPN->stopMonitoring();
+
+        if (monitoring && !switching) logDisconnection();
+        switching=false;
+
+        doConnect();
+    } else {
+        pgmImage->loadImage(":/images/green_shield_icon.png");
+
+        m_connecting=false;
         qDebug() << "VPN is Connected";
         QString logEntry= getConnectionName() + " Connected";
         logSomething(logEntry);
+
         //The first time we get here we run the startup applications
         if (!monitoring) runStartupApps();
         monitoring=true;
-        pgmImage->loadImage(":/images/green_shield_icon.png");
+
         if (m_reportDisconnect) emailServerFailures();
-    } else {
-         qDebug() << "VPN is Disconnected... Attempting to connect to VPN";
-         pgmImage->loadImage(":/images/red_shield_icon.png");
-         if (monitoring && !switching) logDisconnection();
-         switching=false;
-         doConnect();
     }
+}
+void MainWindow::vpnConnected(){
+    //From connecttovpn
+    pingTestVPN->monitorVPN();
+    pingStateChanged(true);
 }
 QString MainWindow::getConnectionName(){
     QString result=m_connectToVPN->currentConnection();
@@ -212,26 +236,40 @@ void MainWindow::runCmdDetached(QProcess * p, QString cmd){
     if (abFunctions::fileExists(cmd)) p->startDetached(cmd);
 }
 void MainWindow::shutdown(){
+
     QSettings settings;
     QString beforeShutdownRunInWindow = settings.value("beforeShutdownRunInWindow").toString();
 
     if (abFunctions::fileExists(beforeShutdownRunInWindow)){
-
+        m_shutdownCancelled=false;
         shutdownProcess = new QProcess(this);
-        connect(shutdownProcess, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(runShutdownCmd()));
+        //connect(shutdownProcess, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(runShutdownCmd()));
         m_shutdownCmdStatus = new dlgRunCLIApp(this, shutdownProcess, beforeShutdownRunInWindow, true, false);
+        connect(m_shutdownCmdStatus, SIGNAL(finished()), this, SLOT(runShutdownCmd()));
+        connect(m_shutdownCmdStatus, SIGNAL(abort()), this, SLOT(cancelShutdown()));
         m_shutdownCmdStatus->show();
 
-    } else runShutdownCmd();
-
+    } else {
+        runShutdownCmd();
+    }
 
 }
+void MainWindow::cancelShutdown(){
+    m_shutdownCancelled=true;
+}
 void MainWindow::runShutdownCmd(){
-    QSettings settings;
-    QString shutdownCmd = settings.value("shutdownCmd").toString();
-    shutdownCmdProcess = new QProcess(this);
-    runCmdDetached(shutdownCmdProcess, shutdownCmd);
-    close();
+    if (!m_shutdownCancelled){
+        saveWindowState();
+        pgmImage->menu()->setEnabled(false);
+
+        QSettings settings;
+        QString shutdownCmd = settings.value("shutdownCmd").toString();
+        shutdownCmdProcess = new QProcess(this);
+        runCmdDetached(shutdownCmdProcess, shutdownCmd);
+//        shutdownCmdProcess->waitForFinished();
+
+        userClose(QMessageBox::Yes);
+    }
 }
 void MainWindow::settings(){
     dlgSettings dialog;

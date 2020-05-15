@@ -1,5 +1,6 @@
 #include "filelist.h"
 #include <QFileDialog>
+#include "filelistlayout.h"
 
 fileList::fileList(QWidget *parent, QString fileList, QString nameFilter): QListWidget(parent){
     m_fileList=fileList;
@@ -8,6 +9,7 @@ fileList::fileList(QWidget *parent, QString fileList, QString nameFilter): QList
     m_list=m_settingsHelper->getList(fileList);
     addItems(m_list);
     setSelectionMode(QAbstractItemView::ExtendedSelection);
+    setColours();
 }
 fileList::~fileList(){
     delete m_settingsHelper;
@@ -28,7 +30,7 @@ void fileList::doAdd(QStringList list){
     this->addItems(filesToAdd);
     m_list << filesToAdd;
     m_settingsHelper->saveList(m_fileList, m_list);
-
+    setColours();
 }
 void fileList::removeSelected(){
 
@@ -45,4 +47,15 @@ void fileList::removeSelected(){
         m_list << itm->text();
     }
     m_settingsHelper->saveList(m_fileList, m_list);
+}
+void fileList::setColours(){
+    for(int i = 0; i < this->count(); ++i)
+    {
+        QListWidgetItem* item = this->item(i);
+        if (fileListLayout::isBlacklisted(item->text())){
+            item->setForeground(Qt::red);
+        } else {
+            item->setForeground(Qt::black);
+        }
+    }
 }

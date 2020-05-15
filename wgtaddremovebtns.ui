@@ -51,6 +51,13 @@
       </spacer>
      </item>
      <item>
+      <widget class="QToolButton" name="btnBlacklist">
+       <property name="text">
+        <string>...</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QToolButton" name="btnAdd">
        <property name="toolTip">
         <string>Add Files</string>
@@ -85,5 +92,25 @@
  <resources>
   <include location="images.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>btnBlacklist</sender>
+   <signal>clicked()</signal>
+   <receiver>wgtAddRemoveBtns</receiver>
+   <slot>onBlacklistButton()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>327</x>
+     <y>12</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>199</x>
+     <y>12</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>onBlacklistButton()</slot>
+ </slots>
 </ui>

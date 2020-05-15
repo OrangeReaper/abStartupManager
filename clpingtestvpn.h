@@ -2,37 +2,31 @@
 #define CLPINGTESTVPN_H
 
 #include <QObject>
-#include <QProcess>
 #include <QString>
 #include <QTimer>
 
-class clpingtestvpn : public QObject
+#include "ping.h"
+
+class clpingtestvpn : public ping
 {
     Q_OBJECT
 public:
     explicit clpingtestvpn(QObject *parent = nullptr);
 
-    enum state {
-        UNKNOWN,
-        CONNECTED,
-        DISCONNECTED
-    };
-
 signals:
-    void vpnConnectionState(bool connected);
+
 public slots:
     void monitorVPN();
-    void pingCommandFinished(int exitCode);
-    void doPing();
+    void stopMonitoring();
 
 private:
     QTimer * m_pingEvery;
-    QString m_doPing;
-    QProcess * m_pingProcess;
-    state m_state=UNKNOWN;
+    //QString m_doPing;
+
     static QString m_getVPNIPAddress(){ return "ip -4 addr show dev tun0"; }
-    QString pingAddress="";
-    void emitSignal(bool connected);
+
+    //int m_alarmAfter;
+    //int m_alarmCount=0;
 
 };
 

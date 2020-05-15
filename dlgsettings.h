@@ -47,6 +47,9 @@ private:
 
     QStringList getProfiles();
     QStringList m_profile_list;
+
+    static QString m_profiles(){ return "Profiles";}
+
 };
 
 #endif // DLGSETTINGS_H

@@ -7,6 +7,7 @@
 #include <QScreen>
 #include <QDate>
 #include <QFile>
+#include <QDir>
 #include <QStandardPaths>
 #include <QCoreApplication>
 
@@ -15,9 +16,19 @@ dlgRunCLIApp::dlgRunCLIApp(QWidget *parent, QProcess *process, QString command, 
     ui(new Ui::dlgRunCLIApp)
 {
     ui->setupUi(this);
-    ui->hideWindow->setVisible(!userCanAbort);
+    ui->hideWindow->setVisible(true); // always
     ui->abortProcess->setVisible(userCanAbort);
-    ui->output->addItem(command);
+
+    logSomething(command);
+
+    if (userCanAbort){
+        QStringList sl=command.split(" ");
+        m_killCommand = sl[0];
+        if (m_killCommand=="sudo") m_killCommand=sl[1];
+        sl=m_killCommand.split("/");
+        m_killCommand=sl[sl.size()-1];
+        m_killCommand="sudo /usr/bin/killall -15 " + m_killCommand;
+    }
 
     //Put window in centre of screen
 
@@ -61,31 +72,36 @@ void dlgRunCLIApp::readyReadStandardOutput(){
     }
 }
 void dlgRunCLIApp::abortProcess(QString line){
-    if (!aborting){
-        for (QString item : m_abort){
-            if (line.contains(item, Qt::CaseInsensitive)){
-                abortProcess();
-                break;
-            }
+
+    for (QString item : m_abort){
+        if (line.contains(item, Qt::CaseInsensitive)){
+            abortProcess();
+            break;
         }
     }
 }
 void dlgRunCLIApp::abortProcess(){
-    aborting=true;
-    saveLog();
-    m_process->kill();
     emit abort();
+    ui->abortProcess->setEnabled(false);
+    logSomething("Process terminated by user.. Wait");
+
+    QProcess p;
+    p.start(m_killCommand);
+    p.waitForFinished();
+
     m_process->waitForFinished();
-    ui->output->addItem("Process terminated");
+
+    saveLog();
+
 }
 
 void dlgRunCLIApp::saveLog(){
     if (!logSaved){
         logSaved=true;
         QString path = QStandardPaths::writableLocation(QStandardPaths::ConfigLocation);
-        path = path + "/" + QCoreApplication::organizationName() + "/logs/abStartupManager";
+        QString logDir = path + "/" + QCoreApplication::organizationName() + "/logs/abStartupManager";
         if (abFunctions::mkdir(path)){
-            path = path + "/" + QDate::currentDate().toString("yyMMdd") + ".log";
+            path = logDir + "/" + QDate::currentDate().toString("yyMMdd") + ".log";
             QFile f(path);
             if (f.open(QIODevice::WriteOnly | QIODevice::Append)) {
                 QString txt = "...\n" ;
@@ -97,9 +113,28 @@ void dlgRunCLIApp::saveLog(){
                     f.write(txt.toUtf8());
                 }
                 f.close();
+                cleanup(logDir);
             }
         }
     }
+    emit finished();
+}
+void dlgRunCLIApp::cleanup(QString logDir){
+    //QDir(const QString & path, const QString & nameFilter, SortFlags sort = SortFlags( Name | IgnoreCase ), Filters filters = AllEntries);
+    QDir dir(logDir,"*.log",( QDir::Name | QDir::IgnoreCase ));
+
+    QSettings settings;
+    int maxLogs = settings.value("maxLogs").toInt();
+
+    while(dir.entryList().size() > maxLogs){
+        if (!dir.remove(dir.entryList().first())) break;
+    }
+}
+
+void dlgRunCLIApp::logSomething(QString text){
+    QString format = "d MMMM yy hh:mm:ss";
+    QString log=QDateTime::currentDateTime().toString(format) + " " + text;
+    ui->output->addItem(log);
 }
 
 

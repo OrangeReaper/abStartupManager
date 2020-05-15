@@ -29,19 +29,26 @@ See the [Wiki](https://github.com/OrangeReaper/abStartupManager/wiki) for some a
 
 - TBC scan ovpn file for virtual network device type (tunX/tapX/null)
 
+- Deal with case when all servers are blacklisted in selected profile
+
+- Deal with selected profile empty
+
 ## Changelog
+**v0.105.x**
+- Improved/simpler logic
 
-**v0.104.x**\
-- VPN Connection Logs and Shutdown Script Logging\
+**v0.104.x**
+- VPN Connection Logs and Shutdown Script Logging
 - Changed method that detects VPN Disconnection
+- User can blacklist servers (rather than delete them)
 
-**v0.103.x**\
+**v0.103.x**
 - More settings improvements; User can now switch between profiles.
 
-**v0.102.x**\
+**v0.102.x**
 - Improve Setting Display; Improve VPN Connection maintenance; Prompt for disconnect on quit.
 
-**v0.101.x**\
+**v0.101.x**
 - Profiles can be added and removed (but can't be used yet).
 
 ## Requires

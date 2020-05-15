@@ -15,6 +15,7 @@ class dlgRunCLIApp : public QDialog
 public:
     explicit dlgRunCLIApp(QWidget *parent = 0, QProcess * process = nullptr, QString command="", bool userCanAbort=true, bool runDetached=false, QStringList abort=QStringList());
     ~dlgRunCLIApp();
+    void logSomething(QString text);
 
 protected:
       void closeEvent(QCloseEvent *event);
@@ -25,13 +26,17 @@ public slots:
     void saveLog();
 signals:
     void abort();
+    void finished();
 
 private:
     Ui::dlgRunCLIApp *ui;
     QProcess * m_process;
     QStringList m_abort;
-    bool aborting=false;
+
+    QString m_killCommand;
+
     void abortProcess(QString line);
+    void cleanup(QString logDir);
 
     bool logSaved=false;
 };

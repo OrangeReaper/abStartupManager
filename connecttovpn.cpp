@@ -1,10 +1,14 @@
 #include "connecttovpn.h"
 #include "abfunctions.h"
 
+
+#include <QNetworkConfigurationManager>
+
 #include <QMessageBox>
 #include <QTextStream>
 #include <QSettings>
 #include <QDebug>
+#include <QThread>
 
 connectToVPN* connectToVPN::s_instance = 0;
 
@@ -21,40 +25,62 @@ connectToVPN* connectToVPN::getInstance(){
 connectToVPN::~connectToVPN()
 {
     killWindow();
+    if (m_doPing) m_doPing->deleteLater();
 }
 void connectToVPN::connectVPN( QString openVPNCmd, QString ovpnFile, QString authFile){
+    waitForNetwork();
+    m_openVPNCmd = openVPNCmd;
+    m_ovpnFile = ovpnFile;
+    m_authFile = authFile;
+    reconnect();
+}
+void connectToVPN::waitForNetwork(){
+    QNetworkConfigurationManager networkConfigurationManager;
+    while (!networkConfigurationManager.isOnline() ){
+        emit logSomething("Waiting for Network to Connect");
+        QThread::sleep(1000);
+    }
+}
+void connectToVPN::reconnect(){
+    killVPNConnections();
 
-    disconnectVPN();
     //needs super user privileges!!!
-    QString program = openVPNCmd + " --config " + ovpnFile + " --auth-user-pass " + authFile;
+    QString program = m_openVPNCmd + " --config " + m_ovpnFile + " --auth-user-pass " + m_authFile;
 
+    if (p_connect) p_connect->deleteLater();
     p_connect = new QProcess(this);
-
-    connect(p_connect, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(on_process_finished()));
 
     QSettings settings;
     QStringList abortOn=settings.value("abortIf").toString().split(",");
-    m_openVPNStatus = new dlgRunCLIApp(0, p_connect, program, false, false, abortOn);
-    connect(m_openVPNStatus, SIGNAL(abort()), this, SLOT(killVPNConnections()));
+    m_openVPNStatus = new dlgRunCLIApp(0, p_connect, program, true, false, abortOn); //changed to runDetached
+    // let monitor decide when to reconnect connect(m_openVPNStatus, SIGNAL(finished()), this, SLOT(reconnect()));
+    m_currentConnection=m_ovpnFile.mid(m_ovpnFile.lastIndexOf("/"));
 
-    m_currentConnection=ovpnFile.mid(ovpnFile.lastIndexOf("/"));
+    m_startTime=QDateTime::currentDateTime();
+    doPing();
+
 }
+void connectToVPN::doPing(){
+    if (m_doPing) m_doPing->deleteLater();
 
-void connectToVPN::on_process_finished(){
-    killWindow();
-//    m_failed=true;
+    m_doPing=new ping();
+    connect (m_doPing, SIGNAL(vpnConnectionState(bool)), this, SLOT(pingState(bool)));
+
+    m_doPing->doPing();
 }
-
-void connectToVPN::killWindow(){
-
-    if (m_openVPNStatus != nullptr) {
-        m_openVPNStatus->close();
-        m_openVPNStatus->deleteLater();
-        m_openVPNStatus=nullptr;
+void connectToVPN::pingState(bool connectionState){
+    m_connected=connectionState;
+    if (m_connected){
+        qDebug() << "Ping Success";
+        emit connected();
+    } else {
+        if (m_startTime.msecsTo(QDateTime::currentDateTime()) > 30000) { // 30 seconds...
+           emit failedToConnect();
+        } else {
+            qDebug() << "Ping Failed";
+            doPing();
+        }
     }
-}
-void connectToVPN::disconnectVPN(){
-    killVPNConnections();
 }
 void connectToVPN::killVPNConnections(){
     QProcess p;
@@ -62,6 +88,13 @@ void connectToVPN::killVPNConnections(){
     p.start(k);
     p.waitForFinished();
     killWindow();
+}
+void connectToVPN::killWindow(){
+    if (m_openVPNStatus != nullptr) {
+        m_openVPNStatus->close();
+        m_openVPNStatus->deleteLater();
+        m_openVPNStatus=nullptr;
+    }
 }
 void connectToVPN::showStatus(){
    if (m_openVPNStatus != nullptr) {

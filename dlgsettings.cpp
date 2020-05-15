@@ -21,6 +21,7 @@ dlgSettings::dlgSettings(QWidget *parent) :
     ui->tabServers->setLayout(m_serverList);
 
     ui->actionRemoveProfile->setEnabled(loadProfiles());
+
 }
 
 dlgSettings::~dlgSettings()
@@ -103,7 +104,8 @@ bool dlgSettings::saveProfileList(){
 }
 QStringList dlgSettings::getProfiles(){
     clSettingsHelper m_settingsHelper;
-    return m_settingsHelper.getList("Profiles");
+    QString f = m_profiles();
+    return m_settingsHelper.getList(f);
 }
 void dlgSettings::removeProfileTabs(){
     //Delete tabs with index > 1

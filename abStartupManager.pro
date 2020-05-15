@@ -54,7 +54,8 @@ SOURCES += \
     dlgselectfromlist.cpp \
     dlggetuserinput.cpp \
     abqaction.cpp \
-    clpingtestvpn.cpp
+    clpingtestvpn.cpp \
+    ping.cpp
 
 HEADERS += \
     mainwindow.h \
@@ -88,7 +89,8 @@ HEADERS += \
     dlgselectfromlist.h \
     dlggetuserinput.h \
     abqaction.h \
-    clpingtestvpn.h
+    clpingtestvpn.h \
+    ping.h
 
 FORMS += \
     mainwindow.ui \

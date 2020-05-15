@@ -8,5 +8,7 @@
         <file>images/redMinus.png</file>
         <file>images/greenPlus.png</file>
         <file>images/abStartupManager.png</file>
+        <file>images/blacklist_icon.png</file>
+        <file>images/whitelist_icon.png</file>
     </qresource>
 </RCC>

@@ -7,7 +7,6 @@
 #include <QMainWindow>
 #include <QSettings>
 #include <QProcess>
-#include <QTimer>
 #include <QThread>
 
 #include "connecttovpn.h"
@@ -32,17 +31,20 @@ public:
 protected:
       void mousePressEvent(QMouseEvent *event);
       void mouseMoveEvent(QMouseEvent *event);
-      void closeEvent(QCloseEvent *event);
 
 public slots:
     void settings();
     void status();
     void shutdown();
-    void vpnConnected(bool isConnected);
+    void cancelShutdown();
+    void vpnConnected();
+    void pingStateChanged(bool isConnected);
     void runShutdownCmd();
-    void userClose();
+    void userClose(QMessageBox::StandardButton reply=QMessageBox::NoButton);
     void populateProfileMenu();
     void selectProfile(QString text);
+    void failedToConnect();
+    void logSomething(QString logEntry);
 private:
     Ui::MainWindow *ui;
 
@@ -54,12 +56,15 @@ private:
     void doConnect();
     void logDisconnection();
     void emailServerFailures();
-    void logSomething(QString logEntry);
+    void saveWindowState();
+    void disconnectVPN();
+
 
     bool monitoring=false;
     bool switching=false;
-    bool m_closing=false;
+    bool m_connecting=false;
     bool m_reportDisconnect=false;
+    bool m_shutdownCancelled=false;
 
     int nextVPNConnection=0;
 
