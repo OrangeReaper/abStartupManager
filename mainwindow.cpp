@@ -20,7 +20,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-   setToolTip("v0.105.0");
+   setToolTip("v0.106.0");
 
 
     QCoreApplication::setOrganizationName("abondServices");//(Strings::organisationName);
@@ -73,7 +73,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     pingTestVPN = new clpingtestvpn(this);
     connect(pingTestVPN, SIGNAL(vpnConnectionState(bool)), this, SLOT(pingStateChanged(bool)));
-    pingTestVPN->monitorVPN(); // Start Monitoring
+    //pingTestVPN->monitorVPN(); // Start Monitoring
+
+    doConnect();
 }
 
 MainWindow::~MainWindow(){
@@ -184,7 +186,8 @@ void MainWindow::pingStateChanged(bool isConnected){
         if (monitoring && !switching) logDisconnection();
         switching=false;
 
-        doConnect();
+        //doConnect();
+        m_connectToVPN->startPing(5000); // ping again with 5 second timeout
     } else {
         pgmImage->loadImage(":/images/green_shield_icon.png");
 
@@ -197,11 +200,15 @@ void MainWindow::pingStateChanged(bool isConnected){
         if (!monitoring) runStartupApps();
         monitoring=true;
 
-        if (m_reportDisconnect) emailServerFailures();
+        if (m_reportDisconnect) {
+            m_reportDisconnect=false;
+            emailServerFailures();
+        }
     }
 }
 void MainWindow::vpnConnected(){
     //From connecttovpn
+    pgmImage->loadImage(":/images/green_shield_icon.png");
     pingTestVPN->monitorVPN();
     pingStateChanged(true);
 }

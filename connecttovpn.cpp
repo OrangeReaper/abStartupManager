@@ -56,9 +56,12 @@ void connectToVPN::reconnect(){
     // let monitor decide when to reconnect connect(m_openVPNStatus, SIGNAL(finished()), this, SLOT(reconnect()));
     m_currentConnection=m_ovpnFile.mid(m_ovpnFile.lastIndexOf("/"));
 
+    startPing(30000); //30 seconds
+}
+void connectToVPN::startPing(int timeout){
+    m_pingTimeout=timeout;
     m_startTime=QDateTime::currentDateTime();
     doPing();
-
 }
 void connectToVPN::doPing(){
     if (m_doPing) m_doPing->deleteLater();
@@ -71,16 +74,23 @@ void connectToVPN::doPing(){
 void connectToVPN::pingState(bool connectionState){
     m_connected=connectionState;
     if (m_connected){
+        pingComplete();
         qDebug() << "Ping Success";
-        emit connected();
+        emit connected();        
     } else {
-        if (m_startTime.msecsTo(QDateTime::currentDateTime()) > 30000) { // 30 seconds...
+        if (m_startTime.msecsTo(QDateTime::currentDateTime()) > m_pingTimeout) {
+            pingComplete();
            emit failedToConnect();
+
         } else {
             qDebug() << "Ping Failed";
             doPing();
         }
     }
+}
+void connectToVPN::pingComplete(){
+    m_doPing->deleteLater();
+    m_doPing=0;
 }
 void connectToVPN::killVPNConnections(){
     QProcess p;

@@ -12,7 +12,7 @@ ping::~ping(){
     if (m_pingProcess) m_pingProcess->deleteLater();
 }
 void ping::doPing(){
-
+    //count=1; deadline(w)=1 - exit after 1 second regardless... send 1 packet
     QString doPingProcess="ping -c 1 -W 1 " + m_pingAddress;
 
     m_pingProcess = new QProcess(this);

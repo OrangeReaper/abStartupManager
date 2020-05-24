@@ -34,6 +34,9 @@ See the [Wiki](https://github.com/OrangeReaper/abStartupManager/wiki) for some a
 - Deal with selected profile empty
 
 ## Changelog
+**v0.106.x**
+- After VPN disconnect ping again for 5 secs to double check status
+
 **v0.105.x**
 - Improved/simpler logic
 

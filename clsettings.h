@@ -12,9 +12,6 @@ public:
     static void validate();
     static void reset();
 
-    static QString configPath(){ return QDir::homePath() + "/.config/comicCat"; }
-    static QString imagesPath(){ return configPath() + "/images";}
-
 private:
 
 };

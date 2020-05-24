@@ -18,7 +18,7 @@ public:
     QString currentConnection(){ return m_currentConnection; }
     void connectVPN(QString openVPNCmd="", QString ovpnFile="", QString authFile="");
     void showStatus();
-
+    void startPing(int timeout);
 public slots:
     void killVPNConnections();
     void reconnect();
@@ -31,7 +31,11 @@ private:
     connectToVPN(){} // Singleton Object
     static connectToVPN *s_instance;
 
+    QDateTime m_startTime;
+    int m_pingTimeout;
     void doPing();
+    void pingComplete();
+
     void killWindow();
     void waitForNetwork();
 
@@ -45,10 +49,8 @@ private:
 
     dlgRunCLIApp * m_openVPNStatus = nullptr;
 
-    //bool m_disabled=false;
     bool m_connected;
 
-    QDateTime m_startTime;
 };
 
 #endif // CONNECTTOVPN_H
