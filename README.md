@@ -23,6 +23,8 @@ See the [Wiki](https://github.com/OrangeReaper/abStartupManager/wiki) for some a
 
 - Display connection state as *on top* icon for instant visibility of connection state
 
+- VPN "Kill Switch" using ipTabes; NB use with care, will overwrite iptables!
+
 ## ToDo
 
 - Add 'About' dialog
@@ -34,6 +36,10 @@ See the [Wiki](https://github.com/OrangeReaper/abStartupManager/wiki) for some a
 - Deal with selected profile empty
 
 ## Changelog
+**v0.107.x**
+- Sets up VPN "Killswitch" using ipTables
+- VPN connection can be (and Killswitch) can be enabled/disabled from menu
+
 **v0.106.x**
 - After VPN disconnect ping again for 5 secs to double check status
 
@@ -81,9 +87,12 @@ Add the following lines
   USER ALL=(root) NOPASSWD: /usr/sbin/openvpn
   USER ALL=(root) NOPASSWD: /usr/bin/killall
   USER ALL=(root) NOPASSWD: /sbin/shutdown
+  USER ALL = (root:root) NOPASSWD: /opt/*
 ```
 
 Change *USER* to the user you wish to add the permission.
+
+*NOTE:* If installing from the provided deb file then scrips will be placed in directory /opt
 
 If you choose to run abStartupManager as from Ubuntu *Startup Applications* then, in keeping with any program that requires X to be initialised before running you should use a command similar to
 

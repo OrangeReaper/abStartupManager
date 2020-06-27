@@ -18,6 +18,8 @@
     "abortIf":"TLS Error,Restart pause",
     "pingAddr":"8.8.8.8",
     "maxLogs":"10",
-    "alarmAfter":"6"
+    "alarmAfter":"6",
+    "removeVpnFirewallCmd":"sudo /opt/removeVpnFirewall.sh",
+    "firewallVpnCmd":"sudo /opt/vpnFirewall.sh"
   }
 }

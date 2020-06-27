@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=abStartupManager
+Version=1.0
+Exec=abStartupManager
+Comment=Startup & VPN Manager
+Icon=abStartupManager.png
+Type=Application
+Terminal=false
+StartupNotify=true
+Encoding=UTF-8
+Categories=Utility;

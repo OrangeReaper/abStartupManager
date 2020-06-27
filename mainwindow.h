@@ -45,11 +45,11 @@ public slots:
     void selectProfile(QString text);
     void failedToConnect();
     void logSomething(QString logEntry);
+    void enable();
+    void disable();
 private:
     Ui::MainWindow *ui;
-
-
-
+    void vpnEnabled(bool enable);
     void connect_vpn(QString openVPNCmd, QString ovpnFile, QString authFile);
     void runStartupApps();
     void runCmdDetached(QProcess * p,QString cmd);
@@ -58,10 +58,13 @@ private:
     void emailServerFailures();
     void saveWindowState();
     void disconnectVPN();
+    void disconnectKillSwitch();
+    void connectKillSwitch();
 
 
     bool monitoring=false;
     bool switching=false;
+    bool m_connected=false;
     bool m_connecting=false;
     bool m_reportDisconnect=false;
     bool m_shutdownCancelled=false;
@@ -87,7 +90,11 @@ private:
 
     QMenu * m_profile = nullptr;
 
+    QAction * a_disable;
+    QAction * a_enable;
 
+    QProcess * p_NoKillSwitch=0;
+    QProcess * p_KillSwitch=0;
 };
 
 #endif // MAINWINDOW_H

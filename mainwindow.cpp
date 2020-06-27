@@ -20,7 +20,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-   setToolTip("v0.106.0");
+   setToolTip("v0.107.0");
 
 
     QCoreApplication::setOrganizationName("abondServices");//(Strings::organisationName);
@@ -36,6 +36,16 @@ MainWindow::MainWindow(QWidget *parent) :
     int iconsize=settings.value("iconSize").toInt();
     pgmImage = new abUIImage(this, ":/images/red_shield_icon.png",iconsize,iconsize);
     resize(iconsize,iconsize);
+
+    a_enable = new QAction("EnableVPN", this);
+    connect(a_enable, SIGNAL(triggered()), this, SLOT(enable()));
+    pgmImage->menu()->addAction(a_enable);
+
+    a_disable = new QAction("DisableVPN", this);
+    connect(a_disable, SIGNAL(triggered()), this, SLOT(disable()));
+    pgmImage->menu()->addAction(a_disable);
+
+    a_enable->setVisible(false);
 
     QAction * a_status = new QAction("Status", this);
     connect(a_status, SIGNAL(triggered()), this, SLOT(status()));
@@ -94,6 +104,43 @@ void MainWindow::mouseMoveEvent(QMouseEvent *event){
         this->move(newpos);
     }
 }
+void MainWindow::enable(){
+    doConnect();
+    disconnectKillSwitch();
+    connectKillSwitch();
+    vpnEnabled(true);
+}
+void MainWindow::disable(){
+    disconnectVPN();
+    disconnectKillSwitch();
+    vpnEnabled(false);
+}
+void MainWindow::vpnEnabled(bool enable){
+    a_enable->setVisible(!enable);
+    a_disable->setVisible(enable);
+}
+void MainWindow::disconnectKillSwitch(){
+    //needs super user privileges!!!
+    QSettings settings;
+    QString program = settings.value("removeVpnFirewallCmd").toString();
+
+    if (p_NoKillSwitch) p_NoKillSwitch->deleteLater();
+    p_NoKillSwitch = new QProcess(this);
+    p_NoKillSwitch->start(program);
+    p_NoKillSwitch->waitForFinished(2000);
+}
+void MainWindow::connectKillSwitch(){
+    //needs super user privileges!!!
+
+    QSettings settings;
+    QString program = settings.value("firewallVpnCmd").toString();
+
+    if (p_KillSwitch) p_KillSwitch->deleteLater();
+    p_KillSwitch = new QProcess(this);
+    p_KillSwitch->start(program);
+    p_KillSwitch->waitForFinished(2000);
+}
+
 void MainWindow::populateProfileMenu(){
     //return;
     m_profile->clear();
@@ -117,24 +164,30 @@ void MainWindow::selectProfile(QString text){
         nextVPNConnection=0;
         switching=true;
         disconnectVPN();
+        doConnect();
     }
 }
 void MainWindow::disconnectVPN(){
+    pingTestVPN->stopMonitoring();
     m_connectToVPN->killVPNConnections();
     pgmImage->loadImage(":/images/red_shield_icon.png");
 }
 void MainWindow::userClose(QMessageBox::StandardButton reply){
-    if (reply==QMessageBox::NoButton){
-        reply = QMessageBox::question(0, "Quit", "Do you want to Disconnect VPN?",
-                                    QMessageBox::Yes|QMessageBox::No);
+    if (m_connected){
+        if (reply==QMessageBox::NoButton){
+            reply = QMessageBox::question(0, "Quit", "Do you want to Disconnect VPN?",
+                                        QMessageBox::Yes|QMessageBox::No);
+        }
+    } else {
+        reply == QMessageBox::No;
     }
     if (reply == QMessageBox::Yes) {
-        pingTestVPN->stopMonitoring();
         disconnectVPN();
     } else {
         m_connectToVPN->deleteLater();
     }
     saveWindowState();
+    this->close();
     QCoreApplication::quit();
 }
 void MainWindow::saveWindowState(){
@@ -143,6 +196,7 @@ void MainWindow::saveWindowState(){
     settings.setValue("windowState", saveState());
 }
 void MainWindow::failedToConnect(){
+    if (monitoring && !switching) logDisconnection();
     QString logEntry= getConnectionName() + " Connection Failed";
     logSomething(logEntry);
     doConnect();
@@ -177,13 +231,13 @@ void MainWindow::connect_vpn(QString openVPNCmd, QString ovpnFile, QString authF
 }
 void MainWindow::pingStateChanged(bool isConnected){
     //On Startup we should always arrive here and either
+    m_connected=isConnected;
     if (!isConnected){
         pgmImage->loadImage(":/images/red_shield_icon.png");
 
         qDebug() << "VPN is Disconnected... Attempting to connect to VPN";
         pingTestVPN->stopMonitoring();
 
-        if (monitoring && !switching) logDisconnection();
         switching=false;
 
         //doConnect();
