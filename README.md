@@ -9,29 +9,30 @@ See the [Wiki](https://github.com/OrangeReaper/abStartupManager/wiki) for some a
 
 ## abStartupManager Supports
 
-- Running of script when VPN Connects (for the first time)
+
+- Running of the script when VPN Connects (for the first time)
 
 - Connect to alternate Server if VPN disconnects
 
-- Connection to VPN Server using .ovpn files (frontend for openvpn)
+- Connection to VPN Server using .ovpn files (frontend for OpenVPN)
 
-- Email notification when non requested vpn disconnect occurs
+- Email notification when non requested VPN disconnect occurs
 
-- Shutdown PC option with ability to run script before shutdown
+- Shutdown PC option with the ability to run the script before the shutdown
 
 - Disconnect VPN on Quit
 
 - Display connection state as *on top* icon for instant visibility of connection state
 
-- VPN "Kill Switch" using ipTabes; NB use with care, will overwrite iptables!
+- VPN "Kill Switch" using ipTabes; NB use with care will overwrite tables!
 
 ## ToDo
 
-- Add 'About' dialog
+- -Add 'About' dialogue
 
-- TBC scan ovpn file for virtual network device type (tunX/tapX/null)
+- TBC scan open file for virtual network device type (tune/taps/null)
 
-- Deal with case when all servers are blacklisted in selected profile
+- Deal with the case when all servers are blacklisted in the selected profile
 
 - Deal with selected profile empty
 
